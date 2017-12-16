@@ -20,7 +20,7 @@ A.new.call # => 42
 A.new.call # => 42
 A.new.call # => 42
 
-# Text will be printed inly once.
+# Text will be printed only once.
 ```
 
 ## License

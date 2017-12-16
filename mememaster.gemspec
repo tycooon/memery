@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
 
   spec.summary       = "A gem for memoization."
   spec.description   = "Mememaster is a gem for memoization."
-  spec.homepage      = "https://github.com/umbrellio/mememaster"
+  spec.homepage      = "https://github.com/tycooon/mememaster"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
