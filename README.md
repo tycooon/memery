@@ -24,9 +24,9 @@ A.new.call # => 42
 ```
 
 ## Features
-Mememaster is very similar to [Memoist](https://github.com/matthewrudy/memoist). The difference is that it doesn't override methods, instead it uses Ruby 2 `Module.prepend` feature. This approach is cleaner and it allows subclasses' methods to work properly: by default, if you redefine a memoized method in a subclass, it's not memoized by default, but you can memoize it normally (without using awkward `identifier: ` argument) and it will just work.
+Mememaster is very similar to [Memoist](https://github.com/matthewrudy/memoist). The difference is that it doesn't override methods, instead it uses Ruby 2 `Module.prepend` feature. This approach is cleaner and it allows subclasses' methods to work properly: if you redefine a memoized method in a subclass, it's not memoized by default, but you can memoize it normally (without using awkward `identifier: ` argument) and it will just work.
 
-The other key difference is that it doesn't change method's signature (no extra `reload` param). If you need unmemoized version of method, just make it like this:
+The other key difference is that it doesn't change method's signature (no extra `reload` param). If you need unmemoized version of method, just create it like this:
 
 ```ruby
 memoize def users
