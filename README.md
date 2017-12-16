@@ -1,6 +1,6 @@
 # Memery
 
-Memery is a gem for memoization in Ruby. Example:
+Memery is a gem for memoization in Ruby.
 
 ## Usage
 
