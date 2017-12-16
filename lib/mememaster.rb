@@ -3,6 +3,17 @@
 require "mememaster/version"
 
 module Mememaster
+  def self.method_visibility(klass, method_name)
+    case
+    when klass.private_method_defined?(method_name)
+      :private
+    when klass.protected_method_defined?(method_name)
+      :protected
+    else
+      :public
+    end
+  end
+
   def memoize(method_name)
     prepend_mememaster_module!
     define_memoized_method!(method_name)
@@ -17,13 +28,14 @@ module Mememaster
   end
 
   def define_memoized_method!(method_name)
-    mod = @_mememaster_module
+    mod_id = @_mememaster_module.object_id
+    visibility = Mememaster.method_visibility(self, method_name)
 
     @_mememaster_module.module_eval do
       define_method(method_name) do |*args|
         @_mememaster_memoized_values ||= {}
 
-        key = [method_name, mod.object_id].join("_").to_sym
+        key = [method_name, mod_id].join("_").to_sym
         store = @_mememaster_memoized_values[key] ||= {}
 
         if store.key?(args)
@@ -32,6 +44,8 @@ module Mememaster
           store[args] = super(*args)
         end
       end
+
+      send(visibility, method_name)
     end
   end
 end

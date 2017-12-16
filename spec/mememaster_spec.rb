@@ -9,8 +9,7 @@ class A
   extend Mememaster
 
   memoize def m
-    CALLS << :m
-    :m
+    m_private
   end
 
   memoize def m_nil
@@ -22,6 +21,14 @@ class A
     CALLS << [x, y]
     [x, y]
   end
+
+  private
+
+  def m_private
+    CALLS << :m
+    :m
+  end
+  memoize :m_private
 end
 
 class B < A
@@ -30,6 +37,19 @@ class B < A
     super(1, 2)
     100
   end
+end
+
+module M
+  extend Mememaster
+
+  memoize def m
+    CALLS << :m
+    :m
+  end
+end
+
+class C
+  include M
 end
 
 RSpec.describe Mememaster do
@@ -54,6 +74,12 @@ RSpec.describe Mememaster do
     end
   end
 
+  context "calling private method" do
+    specify do
+      expect { a.m_private }.to raise_error(NoMethodError)
+    end
+  end
+
   context "inherited class" do
     subject(:b) { B.new }
 
@@ -62,6 +88,16 @@ RSpec.describe Mememaster do
       expect(values).to eq([100, 100, 100])
       expect(CALLS).to eq([[1, 2]])
       expect(B_CALLS).to eq([[1, 1], [1, 2]])
+    end
+  end
+
+  context "module" do
+    subject(:c) { C.new }
+
+    specify do
+      values = [c.m, c.m, c.m]
+      expect(values).to eq([:m, :m, :m])
+      expect(CALLS).to eq([:m])
     end
   end
 end
