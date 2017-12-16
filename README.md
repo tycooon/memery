@@ -16,9 +16,10 @@ class A
   # memoize :call
 end
 
-A.new.call # => 42
-A.new.call # => 42
-A.new.call # => 42
+a = A.new
+a.call # => 42
+a.call # => 42
+a.call # => 42
 
 # Text will be printed only once.
 ```
