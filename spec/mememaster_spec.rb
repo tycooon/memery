@@ -13,8 +13,7 @@ class A
   end
 
   memoize def m_nil
-    CALLS << nil
-    nil
+    m_protected
   end
 
   memoize def m_args(x, y)
@@ -22,13 +21,19 @@ class A
     [x, y]
   end
 
+  protected
+
+  memoize def m_protected
+    CALLS << nil
+    nil
+  end
+
   private
 
-  def m_private
+  memoize def m_private
     CALLS << :m
     :m
   end
-  memoize :m_private
 end
 
 class B < A
@@ -76,7 +81,13 @@ RSpec.describe Mememaster do
 
   context "calling private method" do
     specify do
-      expect { a.m_private }.to raise_error(NoMethodError)
+      expect { a.m_private }.to raise_error(NoMethodError, /private method/)
+    end
+  end
+
+  context "calling protected method" do
+    specify do
+      expect { a.m_protected }.to raise_error(NoMethodError, /protected method/)
     end
   end
 
