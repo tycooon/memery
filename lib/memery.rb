@@ -38,7 +38,9 @@ module Memery
       visibility = Memery.method_visibility(self, method_name)
 
       @_memery_module.module_eval do
-        define_method(method_name) do |*args|
+        define_method(method_name) do |*args, &block|
+          return super(*args, &block) if block
+
           @_memery_memoized_values ||= {}
 
           key = [method_name, mod_id].join("_").to_sym

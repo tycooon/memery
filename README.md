@@ -24,8 +24,10 @@ a = A.new
 a.call # => 42
 a.call # => 42
 a.call # => 42
-
 # Text will be printed only once.
+
+a.call { 1 } # => 42
+# Will print because passing a block disables memoization
 ```
 
 ## Difference with other gems
@@ -74,6 +76,14 @@ Alternatively, you can clear the whole instance's cache:
 ```ruby
 a.clear_memery_cache!
 ```
+
+Finally, you can provide a block:
+
+```ruby
+a.users {}
+```
+
+However, this solution is kind of hacky.
 
 ## License
 

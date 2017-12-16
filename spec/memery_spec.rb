@@ -89,6 +89,17 @@ RSpec.describe Memery do
     end
   end
 
+  context "calling method with block" do
+    specify do
+      values = []
+      values << a.m_args(1, 1) {}
+      values << a.m_args(1, 1) {}
+
+      expect(values).to eq([[1, 1], [1, 1]])
+      expect(CALLS).to eq([[1, 1], [1, 1]])
+    end
+  end
+
   context "calling private method" do
     specify do
       expect { a.m_private }.to raise_error(NoMethodError, /private method/)
