@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require "mememaster/version"
+require "memery/version"
 
-module Mememaster
+module Memery
   def self.included(base)
     base.extend(ClassMethods)
     base.include(InstanceMethods)
@@ -21,28 +21,28 @@ module Mememaster
 
   module ClassMethods
     def memoize(method_name)
-      prepend_mememaster_module!
+      prepend_memery_module!
       define_memoized_method!(method_name)
     end
 
     private
 
-    def prepend_mememaster_module!
-      return if defined?(@_mememaster_module)
-      @_mememaster_module = Module.new
-      prepend @_mememaster_module
+    def prepend_memery_module!
+      return if defined?(@_memery_module)
+      @_memery_module = Module.new
+      prepend @_memery_module
     end
 
     def define_memoized_method!(method_name)
-      mod_id = @_mememaster_module.object_id
-      visibility = Mememaster.method_visibility(self, method_name)
+      mod_id = @_memery_module.object_id
+      visibility = Memery.method_visibility(self, method_name)
 
-      @_mememaster_module.module_eval do
+      @_memery_module.module_eval do
         define_method(method_name) do |*args|
-          @_mememaster_memoized_values ||= {}
+          @_memery_memoized_values ||= {}
 
           key = [method_name, mod_id].join("_").to_sym
-          store = @_mememaster_memoized_values[key] ||= {}
+          store = @_memery_memoized_values[key] ||= {}
 
           if store.key?(args)
             store[args]
@@ -57,8 +57,8 @@ module Mememaster
   end
 
   module InstanceMethods
-    def clear_mememaster_cache!
-      @_mememaster_memoized_values = {}
+    def clear_memery_cache!
+      @_memery_memoized_values = {}
     end
   end
 end

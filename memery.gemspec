@@ -2,17 +2,17 @@
 
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require "mememaster/version"
+require "memery/version"
 
 Gem::Specification.new do |spec|
-  spec.name          = "mememaster"
-  spec.version       = Mememaster::VERSION
+  spec.name          = "memery"
+  spec.version       = Memery::VERSION
   spec.authors       = ["Yuri Smirnov"]
   spec.email         = ["tycooon@yandex.ru"]
 
   spec.summary       = "A gem for memoization."
-  spec.description   = "Mememaster is a gem for memoization."
-  spec.homepage      = "https://github.com/tycooon/mememaster"
+  spec.description   = "Memery is a gem for memoization."
+  spec.homepage      = "https://github.com/tycooon/memery"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|

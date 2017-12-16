@@ -6,7 +6,7 @@ CALLS = []
 B_CALLS = []
 
 class A
-  include Mememaster
+  include Memery
 
   memoize def m
     m_private
@@ -45,7 +45,7 @@ class B < A
 end
 
 module M
-  include Mememaster
+  include Memery
 
   memoize def m
     CALLS << :m
@@ -57,7 +57,7 @@ class C
   include M
 end
 
-RSpec.describe Mememaster do
+RSpec.describe Memery do
   before { CALLS.clear }
   before { B_CALLS.clear }
 
@@ -74,7 +74,7 @@ RSpec.describe Mememaster do
   context "flushing cache" do
     specify do
       values = [ a.m, a.m ]
-      a.clear_mememaster_cache!
+      a.clear_memery_cache!
       values << a.m
       expect(values).to eq([:m, :m, :m])
       expect(CALLS).to eq([:m, :m])
