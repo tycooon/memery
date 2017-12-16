@@ -1,0 +1,6 @@
+inherit_gem:
+  rubocop-config-umbrellio: lib/rubocop.yml
+
+AllCops:
+  DisplayCopNames: true
+  TargetRubyVersion: 2.4
