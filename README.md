@@ -1,6 +1,34 @@
 # Memery
 
-Memery is a gem for memoization in Ruby.
+Memery is a Ruby gem for memoization of method return values. The normal memoization in Ruby doesn't require any gems and looks like this:
+
+```ruby
+def user
+  @user ||= User.find(some_id)
+end
+```
+
+However, this approach dosn't work if the calculated result can be `nil` or `false` or in case the method is using arguments. You will also require extra `begin`/`end` lines in case your method requires multiple lines:
+
+```ruby
+def user
+  @user ||= begin
+    some_id = calculate_id
+    klass = calculate_klass
+    klass.find(some_id)
+  end
+end
+```
+
+For all these situations memoization gems (like this one) exist. The last example can be rewritten using memery like this:
+
+```ruby
+memoize def user
+  some_id = calculate_id
+  klass = calculate_klass
+  klass.find(some_id)
+end
+```
 
 ## Usage
 
