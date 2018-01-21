@@ -30,6 +30,9 @@ memoize def user
 end
 ```
 
+## Installation
+Juts add `gem "memery"` to your Gemfile.
+
 ## Usage
 
 ```ruby
