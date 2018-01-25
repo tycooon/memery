@@ -1,5 +1,7 @@
 # Memery
 
+[![Build Status](https://travis-ci.org/tycooon/memery.svg?branch=master)](https://travis-ci.org/tycooon/memery)
+
 Memery is a Ruby gem for memoization of method return values. The normal memoization in Ruby doesn't require any gems and looks like this:
 
 ```ruby
