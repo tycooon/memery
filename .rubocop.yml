@@ -3,4 +3,4 @@ inherit_gem:
 
 AllCops:
   DisplayCopNames: true
-  TargetRubyVersion: 2.4
+  TargetRubyVersion: 2.5
