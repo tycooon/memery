@@ -1,6 +1,4 @@
-# Memery
-
-[![Build Status](https://travis-ci.org/tycooon/memery.svg?branch=master)](https://travis-ci.org/tycooon/memery)
+# Memery   [![Gem Version](https://badge.fury.io/rb/memery.svg)](https://badge.fury.io/rb/memery) [![Build Status](https://travis-ci.org/tycooon/memery.svg?branch=master)](https://travis-ci.org/tycooon/memery) [![Coverage Status](https://coveralls.io/repos/github/tycooon/memery/badge.svg?branch=master)](https://coveralls.io/github/tycooon/memery?branch=master)
 
 Memery is a Ruby gem for memoization of method return values. The normal memoization in Ruby doesn't require any gems and looks like this:
 
@@ -119,5 +117,7 @@ a.users {}
 However, this solution is kind of hacky.
 
 ## License
-
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
+
+## Author
+Created by Yuri Smirnov.
