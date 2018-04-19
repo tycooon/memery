@@ -8,14 +8,11 @@ module Memery
     base.include(InstanceMethods)
   end
 
+  VISIBILITY_LEVELS = %w[private protected public].freeze
+
   def self.method_visibility(klass, method_name)
-    case
-    when klass.private_method_defined?(method_name)
-      :private
-    when klass.protected_method_defined?(method_name)
-      :protected
-    else
-      :public
+    VISIBILITY_LEVELS.find do |visibility_level|
+      klass.public_send("#{visibility_level}_method_defined?", method_name)
     end
   end
 
