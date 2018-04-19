@@ -61,6 +61,26 @@ a.call { 1 } # => 42
 # Will print because passing a block disables memoization
 ```
 
+For class methods:
+
+```ruby
+class B
+  class << self
+    include Memery
+
+    memoize def call
+      puts "calculating"
+      42
+    end
+  end
+end
+
+B.call # => 42
+B.call # => 42
+B.call # => 42
+# Text will be printed only once.
+```
+
 ## Difference with other gems
 Memery is very similar to [Memoist](https://github.com/matthewrudy/memoist). The difference is that it doesn't override methods, instead it uses Ruby 2 `Module.prepend` feature. This approach is cleaner and it allows subclasses' methods to work properly: if you redefine a memoized method in a subclass, it's not memoized by default, but you can memoize it normally (without using awkward `identifier: ` argument) and it will just work:
 
