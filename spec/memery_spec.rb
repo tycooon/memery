@@ -163,7 +163,9 @@ RSpec.describe Memery do
     end
 
     specify do
-      expect { klass }.to raise_error(ArgumentError, /Method foo is not defined/)
+      expect { klass }.to raise_error(
+        NameError, /undefined method `foo' for class `#<Class:0x\w+>'/
+      )
     end
   end
 end
