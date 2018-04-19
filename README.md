@@ -38,6 +38,7 @@ Juts add `gem "memery"` to your Gemfile.
 ```ruby
 class A
   include Memery
+  # or extend Memery
 
   memoize def call
     puts "calculating"

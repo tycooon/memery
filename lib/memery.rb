@@ -3,9 +3,11 @@
 require "memery/version"
 
 module Memery
-  def self.included(base)
-    base.extend(ClassMethods)
-    base.include(InstanceMethods)
+  %i[included extended].each do |hook|
+    define_singleton_method(hook) do |base|
+      base.extend(ClassMethods)
+      base.include(InstanceMethods)
+    end
   end
 
   def self.method_visibility(klass, method_name)
