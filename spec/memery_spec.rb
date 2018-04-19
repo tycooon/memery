@@ -57,6 +57,17 @@ class C
   include M
 end
 
+class D
+  class << self
+    include Memery
+
+    memoize def m_args(x, y)
+      CALLS << [x, y]
+      [x, y]
+    end
+  end
+end
+
 RSpec.describe Memery do
   before { CALLS.clear }
   before { B_CALLS.clear }
@@ -130,6 +141,16 @@ RSpec.describe Memery do
       values = [c.m, c.m, c.m]
       expect(values).to eq([:m, :m, :m])
       expect(CALLS).to eq([:m])
+    end
+  end
+
+  context "class method with args" do
+    subject(:d) { D }
+
+    specify do
+      values = [ d.m_args(1, 1), d.m_args(1, 1), d.m_args(1, 2) ]
+      expect(values).to eq([[1, 1], [1, 1], [1, 2]])
+      expect(CALLS).to eq([[1, 1], [1, 2]])
     end
   end
 end
