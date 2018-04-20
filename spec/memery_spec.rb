@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 # rubocop:disable Style/MutableConstant
-
 CALLS = []
 B_CALLS = []
+# rubocop:enable Style/MutableConstant
 
 class A
   include Memery
@@ -151,6 +151,19 @@ RSpec.describe Memery do
       values = [ d.m_args(1, 1), d.m_args(1, 1), d.m_args(1, 2) ]
       expect(values).to eq([[1, 1], [1, 1], [1, 2]])
       expect(CALLS).to eq([[1, 1], [1, 2]])
+    end
+  end
+
+  context "memoizing inexistent method" do
+    subject(:klass) do
+      Class.new do
+        include Memery
+        memoize :foo
+      end
+    end
+
+    specify do
+      expect { klass }.to raise_error(ArgumentError, /Method foo is not defined/)
     end
   end
 end

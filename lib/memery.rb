@@ -14,7 +14,7 @@ module Memery
       :private
     when klass.protected_method_defined?(method_name)
       :protected
-    else
+    when klass.public_method_defined?(method_name)
       :public
     end
   end
@@ -36,6 +36,7 @@ module Memery
     def define_memoized_method!(method_name)
       mod_id = @_memery_module.object_id
       visibility = Memery.method_visibility(self, method_name)
+      raise ArgumentError, "Method #{method_name} is not defined on #{self}" unless visibility
 
       @_memery_module.module_eval do
         define_method(method_name) do |*args, &block|
