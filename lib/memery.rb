@@ -21,41 +21,25 @@ module Memery
 
   module ClassMethods
     def memoize(method_name)
-      prepend_memery_module!
-      define_memoized_method!(method_name)
-    end
-
-    private
-
-    def prepend_memery_module!
-      return if defined?(@_memery_module)
-      @_memery_module = Module.new
-      prepend @_memery_module
-    end
-
-    def define_memoized_method!(method_name)
-      mod_id = @_memery_module.object_id
       visibility = Memery.method_visibility(self, method_name)
-      raise ArgumentError, "Method #{method_name} is not defined on #{self}" unless visibility
+      old_method = instance_method(method_name)
 
-      @_memery_module.module_eval do
-        define_method(method_name) do |*args, &block|
-          return super(*args, &block) if block
+      define_method(method_name) do |*args, &block|
+        return old_method.bind(self).call(*args, &block) if block
 
-          @_memery_memoized_values ||= {}
+        @_memery_memoized_values ||= {}
 
-          key = [method_name, mod_id].join("_").to_sym
-          store = @_memery_memoized_values[key] ||= {}
+        key = :"#{method_name}_#{old_method.object_id}"
+        store = @_memery_memoized_values[key] ||= {}
 
-          if store.key?(args)
-            store[args]
-          else
-            store[args] = super(*args)
-          end
+        if store.key?(args)
+          store[args]
+        else
+          store[args] = old_method.bind(self).call(*args)
         end
-
-        send(visibility, method_name)
       end
+
+      send(visibility, method_name)
     end
   end
 
