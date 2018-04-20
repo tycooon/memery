@@ -68,6 +68,15 @@ class D
   end
 end
 
+class E
+  extend Memery
+
+  memoize def m_args(x, y)
+    CALLS << [x, y]
+    [x, y]
+  end
+end
+
 RSpec.describe Memery do
   before { CALLS.clear }
   before { B_CALLS.clear }
@@ -164,6 +173,16 @@ RSpec.describe Memery do
 
     specify do
       expect { klass }.to raise_error(ArgumentError, /Method foo is not defined/)
+    end
+  end
+
+  context "extend" do
+    subject(:e) { E.new }
+
+    specify do
+      values = [ e.m_args(1, 1), e.m_args(1, 1), e.m_args(1, 2) ]
+      expect(values).to eq([[1, 1], [1, 1], [1, 2]])
+      expect(CALLS).to eq([[1, 1], [1, 2]])
     end
   end
 end
