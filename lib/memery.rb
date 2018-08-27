@@ -20,9 +20,9 @@ module Memery
   end
 
   module ClassMethods
-    def memoize(method_name)
+    def memoize(method_name, condition: nil)
       prepend_memery_module!
-      define_memoized_method!(method_name)
+      define_memoized_method!(method_name, condition: condition)
     end
 
     private
@@ -33,14 +33,16 @@ module Memery
       prepend @_memery_module
     end
 
-    def define_memoized_method!(method_name)
+    def define_memoized_method!(method_name, condition: nil)
       mod_id = @_memery_module.object_id
       visibility = Memery.method_visibility(self, method_name)
       raise ArgumentError, "Method #{method_name} is not defined on #{self}" unless visibility
 
       @_memery_module.module_eval do
         define_method(method_name) do |*args, &block|
-          return super(*args, &block) if block
+          if block || (condition && !instance_exec(&condition))
+            return super(*args, &block)
+          end
 
           @_memery_memoized_values ||= {}
 
