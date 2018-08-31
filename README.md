@@ -81,6 +81,41 @@ B.call # => 42
 # Text will be printed only once.
 ```
 
+For conditional memoization:
+
+```ruby
+class A
+  include Memery
+
+  attr_accessor :environment
+
+  def call
+    puts "calculating"
+    42
+  end
+
+  memoize :call, condition: -> { environment == 'production' }
+end
+
+a = A.new
+a.environment = 'development'
+a.call # => 42
+# calculating
+a.call # => 42
+# calculating
+a.call # => 42
+# calculating
+# Text will be printed every time because result of condition block is `false`.
+
+a.environment = 'production'
+a.call # => 42
+# calculating
+a.call # => 42
+a.call # => 42
+# Text will be printed only once because there is memoization
+# with `true` result of condition block.
+```
+
 ## Difference with other gems
 Memery is very similar to [Memoist](https://github.com/matthewrudy/memoist). The difference is that it doesn't override methods, instead it uses Ruby 2 `Module.prepend` feature. This approach is cleaner and it allows subclasses' methods to work properly: if you redefine a memoized method in a subclass, it's not memoized by default, but you can memoize it normally (without using awkward `identifier: ` argument) and it will just work:
 
