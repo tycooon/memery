@@ -78,10 +78,10 @@ class D
 end
 
 RSpec.describe Memery do
+  subject(:a) { A.new }
+
   before { CALLS.clear }
   before { B_CALLS.clear }
-
-  subject(:a) { A.new }
 
   context "methods without args" do
     specify do

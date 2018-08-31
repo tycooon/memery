@@ -4,3 +4,9 @@ inherit_gem:
 AllCops:
   DisplayCopNames: true
   TargetRubyVersion: 2.5
+
+Naming/UncommunicativeMethodParamName:
+  AllowedNames: ["x", "y", "z"]
+
+RSpec/EmptyLineAfterHook:
+  Enabled: false
