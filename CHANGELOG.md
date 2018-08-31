@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.0.0] - 2018-08-31
+### Added
+- Add `:condition` option for `.memoize` method ([@AlexWayfer]) [#7]
+
 ## [0.6.0] - 2018-04-20
 ### Added
 - Readme example for memoizing class methods. ([@AlexWayfer]) [#3]
@@ -10,9 +14,11 @@
 
 [0.5.0]: https://github.com/tycooon/memery/tree/v0.5.0
 [0.6.0]: https://github.com/tycooon/memery/compare/v0.5.0...v0.6.0
+[1.0.0]: https://github.com/tycooon/memery/compare/v0.6.0...v1.0.0
 [Unreleased]: https://github.com/tycooon/memery/compare/v0.6.0...HEAD
 
 [@tycooon]: https://github.com/tycooon
 [@AlexWayfer]: https://github.com/AlexWayfer
 
 [#3]: https://github.com/tycooon/memery/pull/3
+[#7]: https://github.com/tycooon/memery/pull/7
