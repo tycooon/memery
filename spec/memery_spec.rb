@@ -8,6 +8,8 @@ B_CALLS = []
 class A
   include Memery
 
+  attr_accessor :environment
+
   memoize def m
     m_private
   end
@@ -20,6 +22,13 @@ class A
     CALLS << [x, y]
     [x, y]
   end
+
+  def m_condition
+    CALLS << __method__
+    __method__
+  end
+
+  memoize :m_condition, condition: -> { environment == "production" }
 
   protected
 
@@ -164,6 +173,32 @@ RSpec.describe Memery do
 
     specify do
       expect { klass }.to raise_error(ArgumentError, /Method foo is not defined/)
+    end
+  end
+
+  describe ":condition option" do
+    before do
+      a.environment = environment
+    end
+
+    context "returns true" do
+      let(:environment) { "production" }
+
+      specify do
+        values = [ a.m_condition, a.m_nil, a.m_condition, a.m_nil ]
+        expect(values).to eq([:m_condition, nil, :m_condition, nil])
+        expect(CALLS).to eq([:m_condition, nil])
+      end
+    end
+
+    context "returns false" do
+      let(:environment) { "development" }
+
+      specify do
+        values = [ a.m_condition, a.m_nil, a.m_condition, a.m_nil ]
+        expect(values).to eq([:m_condition, nil, :m_condition, nil])
+        expect(CALLS).to eq([:m_condition, nil, :m_condition])
+      end
     end
   end
 end
