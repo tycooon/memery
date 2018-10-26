@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "memery/version"
+require "reentrant_mutex"
 
 module Memery
   def self.included(base)
@@ -45,14 +46,27 @@ module Memery
           end
 
           @_memery_memoized_values ||= {}
+          @_memery_mutex ||= ReentrantMutex.new
 
           key = [method_name, mod_id].join("_").to_sym
-          store = @_memery_memoized_values[key] ||= {}
+          store = if @_memery_memoized_values[key]
+            @_memery_memoized_values[key]
+          else
+            @_memery_mutex.synchronize do
+              @_memery_memoized_values[key] ||= {}
+            end
+          end
 
           if store.key?(args)
             store[args]
           else
-            store[args] = super(*args)
+            @_memery_mutex.synchronize do
+              if store.key?(args)
+                store[args]
+              else
+                store[args] = super(*args)
+              end
+            end
           end
         end
 
@@ -63,7 +77,11 @@ module Memery
 
   module InstanceMethods
     def clear_memery_cache!
-      @_memery_memoized_values = {}
+      if @_memery_mutex
+        @_memery_mutex.synchronize do
+          @_memery_memoized_values = {}
+        end
+      end
     end
   end
 end

@@ -201,4 +201,8 @@ RSpec.describe Memery do
       end
     end
   end
+
+  describe "thread safety" do
+    # To be added
+  end
 end

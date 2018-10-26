@@ -1,6 +1,6 @@
 # Memery   [![Gem Version](https://badge.fury.io/rb/memery.svg)](https://badge.fury.io/rb/memery) [![Build Status](https://travis-ci.org/tycooon/memery.svg?branch=master)](https://travis-ci.org/tycooon/memery) [![Coverage Status](https://coveralls.io/repos/github/tycooon/memery/badge.svg?branch=master)](https://coveralls.io/github/tycooon/memery?branch=master)
 
-Memery is a Ruby gem for memoization of method return values. The normal memoization in Ruby doesn't require any gems and looks like this:
+Memery is a Ruby gem for thread safe memoization of method return values. The normal memoization in Ruby doesn't require any gems and looks like this:
 
 ```ruby
 def user
@@ -170,6 +170,52 @@ a.users {}
 ```
 
 However, this solution is kind of hacky.
+
+### Thread safety
+
+To ensure thread safety a mutex is held when the method is evaluated the first time. This prevents a slow method being evaluated concurrently many times before a value has been calculated.
+
+```ruby
+class A
+  include Memery
+  def initialize
+    @b = 0
+  end
+
+  memoize def foo
+    @b += 1
+    sleep 1
+    @b
+  end
+end
+
+a = A.new
+thread = Thread.start do
+  a.foo
+end
+a.foo
+thread.join
+a.foo # => 1
+```
+
+A [ReentrantMutex](https://github.com/dotboris/reentrant_mutex) is held which allows for recursive method definitions
+
+```ruby
+class A
+  include Memery
+  def initialize
+    @b = 0
+  end
+
+  memoize def foo
+    @b += 1
+    @b > 5 ? @b : foo
+  end
+end
+
+a = A.new
+a.foo # => 6
+```
 
 ## Contributing
 Bug reports and pull requests are welcome on GitHub at https://github.com/tycooon/memery.
