@@ -31,7 +31,8 @@ end
 ```
 
 ## Installation
-Juts add `gem "memery"` to your Gemfile.
+
+Simply add `gem "memery"` to your Gemfile.
 
 ## Usage
 
@@ -172,10 +173,13 @@ a.users {}
 However, this solution is kind of hacky.
 
 ## Contributing
+
 Bug reports and pull requests are welcome on GitHub at https://github.com/tycooon/memery.
 
 ## License
+
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
 
 ## Author
+
 Created by Yuri Smirnov.
