@@ -117,6 +117,38 @@ a.call # => 42
 # with `true` result of condition block.
 ```
 
+For memoization with time-to-live:
+
+```ruby
+class A
+  include Memery
+
+  def call
+    puts "calculating"
+    42
+  end
+
+  memoize :call, ttl: 3 # seconds
+end
+
+a = A.new
+a.call # => 42
+# calculating
+a.call # => 42
+a.call # => 42
+# Text will be printed again only after 3 seconds of time-to-live.
+# 3 seconds later...
+a.call # => 42
+# calculating
+a.call # => 42
+a.call # => 42
+# another 3 seconds later...
+a.call # => 42
+# calculating
+a.call # => 42
+a.call # => 42
+```
+
 ## Difference with other gems
 Memery is very similar to [Memoist](https://github.com/matthewrudy/memoist). The difference is that it doesn't override methods, instead it uses Ruby 2 `Module.prepend` feature. This approach is cleaner (for example you are able to inspect the original method body using `method(:x).super_method.source`) and it allows subclasses' methods to work properly: if you redefine a memoized method in a subclass, it's not memoized by default, but you can memoize it normally (without using awkward `identifier: ` argument) and it will just work:
 

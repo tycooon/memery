@@ -30,6 +30,13 @@ class A
 
   memoize :m_condition, condition: -> { environment == "production" }
 
+  def m_ttl(x, y)
+    CALLS << [x, y]
+    [x, y]
+  end
+
+  memoize :m_ttl, ttl: 3
+
   protected
 
   memoize def m_protected
@@ -74,6 +81,17 @@ class D
       CALLS << [x, y]
       [x, y]
     end
+  end
+end
+
+class E
+  extend Forwardable
+  def_delegator :a, :m
+
+  include Memery
+
+  memoize def a
+    A.new
   end
 end
 
@@ -176,6 +194,16 @@ RSpec.describe Memery do
     end
   end
 
+  context "Forwardable" do
+    subject(:e) { E.new }
+
+    specify do
+      values = [e.m, e.m, e.m]
+      expect(values).to eq([:m, :m, :m])
+      expect(CALLS).to eq([:m])
+    end
+  end
+
   describe ":condition option" do
     before do
       a.environment = environment
@@ -189,6 +217,31 @@ RSpec.describe Memery do
         expect(values).to eq([:m_condition, nil, :m_condition, nil])
         expect(CALLS).to eq([:m_condition, nil])
       end
+    end
+
+    context "returns false" do
+      let(:environment) { "development" }
+
+      specify do
+        values = [ a.m_condition, a.m_nil, a.m_condition, a.m_nil ]
+        expect(values).to eq([:m_condition, nil, :m_condition, nil])
+        expect(CALLS).to eq([:m_condition, nil, :m_condition])
+      end
+    end
+  end
+
+  describe ":ttl option" do
+    specify do
+      values = [ a.m_ttl(1, 1), a.m_ttl(1, 1), a.m_ttl(1, 2) ]
+      expect(values).to eq([[1, 1], [1, 1], [1, 2]])
+      expect(CALLS).to eq([[1, 1], [1, 2]])
+
+      allow(Process).to receive(:clock_gettime).with(Process::CLOCK_MONOTONIC)
+        .and_wrap_original { |m, *args| m.call(*args) + 5 }
+
+      values = [ a.m_ttl(1, 1), a.m_ttl(1, 1), a.m_ttl(1, 2) ]
+      expect(values).to eq([[1, 1], [1, 1], [1, 2]])
+      expect(CALLS).to eq([[1, 1], [1, 2], [1, 1], [1, 2]])
     end
 
     context "returns false" do
