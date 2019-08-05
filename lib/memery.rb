@@ -44,16 +44,15 @@ module Memery
             return super(*args, &block)
           end
 
+          key = "#{method_name}_#{mod_id}"
+
+          store = @_memery_memoized_values&.[](key)
+
+          return store[args] if store&.key?(args)
+
           @_memery_memoized_values ||= {}
-
-          key = [method_name, mod_id].join("_").to_sym
-          store = @_memery_memoized_values[key] ||= {}
-
-          if store.key?(args)
-            store[args]
-          else
-            store[args] = super(*args)
-          end
+          @_memery_memoized_values[key] ||= {}
+          @_memery_memoized_values[key][args] = super(*args)
         end
 
         send(visibility, method_name)
