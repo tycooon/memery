@@ -50,18 +50,19 @@ module Memery
             return super(*args, &block)
           end
 
+          @_memery_memoized_values ||= {}
           key = "#{method_name}_#{mod_id}"
+          @_memery_memoized_values[key] ||= {}
+          store = @_memery_memoized_values[key] || {}
 
-          store = @_memery_memoized_values&.[](key)
-
-          if store&.key?(args) && (ttl.nil? || Memery.monotonic_clock <= store[args][:time] + ttl)
+          if store.key?(args) && (ttl.nil? || Memery.monotonic_clock <= store[args][:time] + ttl)
             return store[args][:result]
           end
 
-          (
-            ((@_memery_memoized_values ||= {})[key] ||= {})[args] =
-              { result: super(*args), time: Memery.monotonic_clock }
-          )[:result]
+          super(*args).tap do |result|
+            @_memery_memoized_values[key][args] =
+              { result: result, time: Memery.monotonic_clock }
+          end
         end
 
         send(visibility, method_name)
