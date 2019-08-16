@@ -44,14 +44,12 @@ module Memery
             return super(*args, &block)
           end
 
+          @_memery_memoized_values ||= {}
           key = "#{method_name}_#{mod_id}"
-
-          store = @_memery_memoized_values&.[](key)
-
+          @_memery_memoized_values[key] ||= {}
+          store = @_memery_memoized_values[key]
           return store[args] if store&.key?(args)
 
-          @_memery_memoized_values ||= {}
-          @_memery_memoized_values[key] ||= {}
           @_memery_memoized_values[key][args] = super(*args)
         end
 
