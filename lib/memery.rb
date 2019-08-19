@@ -39,6 +39,7 @@ module Memery
       prepend @_memery_module
     end
 
+    # rubocop:disable Metrics/MethodLength
     def define_memoized_method!(method_name, condition: nil, ttl: nil)
       mod_id = @_memery_module.object_id
       visibility = Memery.method_visibility(self, method_name)
@@ -60,14 +61,14 @@ module Memery
           end
 
           super(*args).tap do |result|
-            @_memery_memoized_values[key][args] =
-              { result: result, time: Memery.monotonic_clock }
+            @_memery_memoized_values[key][args] = { result: result, time: Memery.monotonic_clock }
           end
         end
 
         send(visibility, method_name)
       end
     end
+    # rubocop:enable Metrics/MethodLength
   end
 
   module InstanceMethods
