@@ -39,7 +39,6 @@ module Memery
       prepend @_memery_module
     end
 
-    # rubocop:disable Metrics/MethodLength
     def define_memoized_method!(method_name, condition: nil, ttl: nil)
       mod_id = @_memery_module.object_id
       visibility = Memery.method_visibility(self, method_name)
@@ -51,24 +50,22 @@ module Memery
             return super(*args, &block)
           end
 
-          @_memery_memoized_values ||= {}
           key = "#{method_name}_#{mod_id}"
-          @_memery_memoized_values[key] ||= {}
-          store = @_memery_memoized_values[key] || {}
+
+          store = (@_memery_memoized_values ||= {})[key] ||= {}
 
           if store.key?(args) && (ttl.nil? || Memery.monotonic_clock <= store[args][:time] + ttl)
             return store[args][:result]
           end
 
-          super(*args).tap do |result|
-            @_memery_memoized_values[key][args] = { result: result, time: Memery.monotonic_clock }
-          end
+          result = super(*args)
+          @_memery_memoized_values[key][args] = { result: result, time: Memery.monotonic_clock }
+          result
         end
 
         send(visibility, method_name)
       end
     end
-    # rubocop:enable Metrics/MethodLength
   end
 
   module InstanceMethods
