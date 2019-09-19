@@ -14,6 +14,8 @@ class A
     m_private
   end
 
+  def not_memoized; end
+
   memoize def m_nil
     m_protected
   end
@@ -67,6 +69,12 @@ module M
     CALLS << :m
     :m
   end
+
+  def not_memoized; end
+
+  private
+
+  memoize def m_private; end
 end
 
 class C
@@ -93,6 +101,12 @@ class E
   memoize def a
     A.new
   end
+end
+
+class F
+  include Memery
+
+  def m; end
 end
 
 RSpec.describe Memery do
@@ -252,6 +266,61 @@ RSpec.describe Memery do
         expect(values).to eq([:m_condition, nil, :m_condition, nil])
         expect(CALLS).to eq([:m_condition, nil, :m_condition])
       end
+    end
+  end
+
+  describe ".memoized?" do
+    subject { object.memoized?(method_name) }
+
+    context "class without memoized methods" do
+      let(:object) { F }
+      let(:method_name) { :m }
+
+      it { is_expected.to be false }
+    end
+
+    shared_examples "works correctly" do
+      context "public memoized method" do
+        let(:method_name) { :m }
+
+        it { is_expected.to be true }
+      end
+
+      context "private memoized method" do
+        let(:method_name) { :m_private }
+
+        it { is_expected.to be true }
+      end
+
+      context "non-memoized method" do
+        let(:method_name) { :not_memoized }
+
+        it { is_expected.to be false }
+      end
+
+      context "standard class method" do
+        let(:method_name) { :constants }
+
+        it { is_expected.to be false }
+      end
+
+      context "standard instance method" do
+        let(:method_name) { :to_s }
+
+        it { is_expected.to be false }
+      end
+    end
+
+    context "class" do
+      let(:object) { A }
+
+      include_examples "works correctly"
+    end
+
+    context "module" do
+      let(:object) { M }
+
+      include_examples "works correctly"
     end
   end
 end
