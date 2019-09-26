@@ -62,6 +62,25 @@ a.call { 1 } # => 42
 # Will print because passing a block disables memoization
 ```
 
+Methods with arguments are supported and the memoization will be done based on arguments using an internal hash. So this will work as expected:
+
+```ruby
+class A
+  include Memery
+
+  memoize def call(arg1, arg2)
+    puts "calculating"
+    arg1 + arg2
+  end
+end
+
+a = A.new
+a.call(1, 5) # => 6
+a.call(2, 15) # => 17
+a.call(1, 5) # => 6
+# Text will be printed only twice, once per unique argument list.
+```
+
 For class methods:
 
 ```ruby
