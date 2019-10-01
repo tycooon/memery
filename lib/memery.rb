@@ -31,6 +31,13 @@ module Memery
       define_memoized_method!(method_name, condition: condition, ttl: ttl)
     end
 
+    def memoized?(method_name)
+      return false unless defined?(@_memery_module)
+
+      @_memery_module.method_defined?(method_name) ||
+        @_memery_module.private_method_defined?(method_name)
+    end
+
     private
 
     def prepend_memery_module!

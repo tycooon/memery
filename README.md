@@ -168,6 +168,28 @@ a.call # => 42
 a.call # => 42
 ```
 
+Check if method is memoized:
+
+```ruby
+class A
+  include Memery
+
+  memoize def call
+    puts "calculating"
+    42
+  end
+
+  def execute
+    puts "non-memoized"
+  end
+end
+
+a = A.new
+
+a.memoized?(:call) # => true
+a.memoized?(:execute) # => false
+```
+
 ## Difference with other gems
 Memery is very similar to [Memoist](https://github.com/matthewrudy/memoist). The difference is that it doesn't override methods, instead it uses Ruby 2 `Module.prepend` feature. This approach is cleaner (for example you are able to inspect the original method body using `method(:x).super_method.source`) and it allows subclasses' methods to work properly: if you redefine a memoized method in a subclass, it's not memoized by default, but you can memoize it normally (without using awkward `identifier: ` argument) and it will just work:
 
