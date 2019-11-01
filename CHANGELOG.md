@@ -19,7 +19,7 @@
 - Readme example for memoizing class methods. ([@AlexWayfer]) [#3]
 - Memery raises `ArgumentError` if method is not defined when you call `memoize`.
 
-## [0.5.0] - 2017-16-12
+## [0.5.0] - 2017-06-12
 - Initial public version.
 
 [0.5.0]: https://github.com/tycooon/memery/tree/v0.5.0
