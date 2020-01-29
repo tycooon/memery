@@ -5,7 +5,7 @@ AllCops:
   DisplayCopNames: true
   TargetRubyVersion: 2.5
 
-Naming/UncommunicativeMethodParamName:
+Naming/MethodParameterName:
   AllowedNames: ["x", "y", "z"]
 
 RSpec/EmptyLineAfterHook:
