@@ -25,6 +25,16 @@ class A
     [x, y]
   end
 
+  memoize def m_kwargs(x, y: 42)
+    CALLS << [x, y]
+    [x, y]
+  end
+
+  memoize def m_double_splat(x, **kwargs)
+    CALLS << [x, kwargs]
+    [x, kwargs]
+  end
+
   def m_condition
     CALLS << __method__
     __method__
@@ -138,6 +148,22 @@ RSpec.describe Memery do
       values = [ a.m_args(1, 1), a.m_args(1, 1), a.m_args(1, 2) ]
       expect(values).to eq([[1, 1], [1, 1], [1, 2]])
       expect(CALLS).to eq([[1, 1], [1, 2]])
+    end
+  end
+
+  context "method with keyword args" do
+    specify do
+      values = [ a.m_kwargs(1, y: 2), a.m_kwargs(1, y: 2), a.m_kwargs(1, y: 3) ]
+      expect(values).to eq([[1, 2], [1, 2], [1, 3]])
+      expect(CALLS).to eq([[1, 2], [1, 3]])
+    end
+  end
+
+  context "method with double splat argument" do
+    specify do
+      values = [ a.m_double_splat(1, y: 2), a.m_double_splat(1, y: 2), a.m_double_splat(1, y: 3) ]
+      expect(values).to eq([[1, { y: 2 }], [1, { y: 2 }], [1, { y: 3 }]])
+      expect(CALLS).to eq([[1, { y: 2 }], [1, { y: 3 }]])
     end
   end
 

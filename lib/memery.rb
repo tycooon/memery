@@ -47,31 +47,33 @@ module Memery
     end
 
     def define_memoized_method!(method_name, condition: nil, ttl: nil)
-      mod_id = @_memery_module.object_id
       visibility = Memery.method_visibility(self, method_name)
       raise ArgumentError, "Method #{method_name} is not defined on #{self}" unless visibility
 
-      @_memery_module.module_eval do
-        define_method(method_name) do |*args, &block|
-          if block || (condition && !instance_exec(&condition))
-            return super(*args, &block)
-          end
+      method_key = "#{method_name}_#{@_memery_module.object_id}"
 
-          key = "#{method_name}_#{mod_id}"
-
-          store = (@_memery_memoized_values ||= {})[key] ||= {}
-
-          if store.key?(args) && (ttl.nil? || Memery.monotonic_clock <= store[args][:time] + ttl)
-            return store[args][:result]
-          end
-
-          result = super(*args)
-          @_memery_memoized_values[key][args] = { result: result, time: Memery.monotonic_clock }
-          result
+      # Change to regular call of `define_method` after Ruby 2.4 drop
+      @_memery_module.send :define_method, method_name, (lambda do |*args, **kwargs, &block|
+        if block || (condition && !instance_exec(&condition))
+          return kwargs.any? ? super(*args, **kwargs, &block) : super(*args, &block)
         end
 
-        send(visibility, method_name)
-      end
+        args_key = [args, kwargs]
+
+        store = (@_memery_memoized_values ||= {})[method_key] ||= {}
+
+        if store.key?(args_key) &&
+          (ttl.nil? || Memery.monotonic_clock <= store[args_key][:time] + ttl)
+          return store[args_key][:result]
+        end
+
+        result = kwargs.any? ? super(*args, **kwargs) : super(*args)
+        @_memery_memoized_values[method_key][args_key] =
+          { result: result, time: Memery.monotonic_clock }
+        result
+      end)
+
+      @_memery_module.send(visibility, method_name)
     end
   end
 
