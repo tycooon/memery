@@ -29,6 +29,7 @@ module Memery
     def memoize(method_name, condition: nil, ttl: nil)
       prepend_memery_module!
       define_memoized_method!(method_name, condition: condition, ttl: ttl)
+      method_name
     end
 
     def memoized?(method_name)
