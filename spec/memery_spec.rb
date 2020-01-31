@@ -119,6 +119,16 @@ class F
   def m; end
 end
 
+class G
+  include Memery
+
+  def self.macro(name)
+    define_method(:macro_received) { name }
+  end
+
+  macro memoize def g; end
+end
+
 RSpec.describe Memery do
   subject(:a) { A.new }
 
@@ -187,6 +197,14 @@ RSpec.describe Memery do
   context "calling protected method" do
     specify do
       expect { a.m_protected }.to raise_error(NoMethodError, /protected method/)
+    end
+  end
+
+  context "Chaining macros" do
+    subject(:g) { G.new }
+
+    specify do
+      expect(g.macro_received).to eq :g
     end
   end
 
