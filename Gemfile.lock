@@ -2,6 +2,7 @@ PATH
   remote: .
   specs:
     memery (1.3.0)
+      warning (~> 1.0)
 
 GEM
   remote: https://rubygems.org/
@@ -77,6 +78,7 @@ GEM
     tins (1.24.0)
       sync
     unicode-display_width (1.6.1)
+    warning (1.0.0)
 
 PLATFORMS
   ruby

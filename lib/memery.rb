@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# https://bugs.ruby-lang.org/issues/14909#note-7
+require "warning"
+Warning.ignore :keyword_separation, __FILE__
+
 require "memery/version"
 
 module Memery
@@ -54,22 +58,20 @@ module Memery
       method_key = "#{method_name}_#{@_memery_module.object_id}"
 
       # Change to regular call of `define_method` after Ruby 2.4 drop
-      @_memery_module.send :define_method, method_name, (lambda do |*args, **kwargs, &block|
+      @_memery_module.send :define_method, method_name, (lambda do |*args, &block|
         if block || (condition && !instance_exec(&condition))
-          return kwargs.any? ? super(*args, **kwargs, &block) : super(*args, &block)
+          return super(*args, &block)
         end
-
-        args_key = [args, kwargs]
 
         store = (@_memery_memoized_values ||= {})[method_key] ||= {}
 
-        if store.key?(args_key) &&
-          (ttl.nil? || Memery.monotonic_clock <= store[args_key][:time] + ttl)
-          return store[args_key][:result]
+        if store.key?(args) &&
+          (ttl.nil? || Memery.monotonic_clock <= store[args][:time] + ttl)
+          return store[args][:result]
         end
 
-        result = kwargs.any? ? super(*args, **kwargs) : super(*args)
-        @_memery_memoized_values[method_key][args_key] =
+        result = super(*args)
+        @_memery_memoized_values[method_key][args] =
           { result: result, time: Memery.monotonic_clock }
         result
       end)

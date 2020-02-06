@@ -20,6 +20,8 @@ Gem::Specification.new do |spec|
   end
   spec.require_paths = ["lib"]
 
+  spec.add_dependency "warning", "~> 1.0"
+
   spec.add_development_dependency "benchmark-ips"
   spec.add_development_dependency "benchmark-memory"
   spec.add_development_dependency "bundler"

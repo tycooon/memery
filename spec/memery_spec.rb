@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# https://bugs.ruby-lang.org/issues/14909#note-7
+# https://github.com/jeremyevans/ruby-warning/issues/6
+Warning.ignore :keyword_separation, __FILE__
+
 # rubocop:disable Style/MutableConstant
 CALLS = []
 B_CALLS = []
@@ -158,6 +162,24 @@ RSpec.describe Memery do
       values = [ a.m_args(1, 1), a.m_args(1, 1), a.m_args(1, 2) ]
       expect(values).to eq([[1, 1], [1, 1], [1, 2]])
       expect(CALLS).to eq([[1, 1], [1, 2]])
+    end
+
+    context "receiving Hash-like object" do
+      let(:object_class) do
+        Struct.new(:first_name, :last_name) do
+          # For example, Sequel models have such implicit coercion,
+          # which conflicts with `**kwargs`.
+          alias_method :to_hash, :to_h
+        end
+      end
+
+      let(:object) { object_class.new("John", "Wick") }
+
+      specify do
+        values = [ a.m_args(1, object), a.m_args(1, object), a.m_args(1, 2) ]
+        expect(values).to eq([[1, object], [1, object], [1, 2]])
+        expect(CALLS).to eq([[1, object], [1, 2]])
+      end
     end
   end
 
