@@ -4,11 +4,6 @@ require "memery/version"
 
 module Memery
   class << self
-    def included(base)
-      base.extend(ClassMethods)
-      base.include(InstanceMethods)
-    end
-
     def method_visibility(klass, method_name)
       case
       when klass.private_method_defined?(method_name)
@@ -24,6 +19,16 @@ module Memery
       Process.clock_gettime(Process::CLOCK_MONOTONIC)
     end
   end
+
+  module ModuleMethods
+    def included(base)
+      base.extend(ClassMethods)
+      base.include(InstanceMethods)
+      base.extend ModuleMethods if base.instance_of?(Module)
+    end
+  end
+
+  extend ModuleMethods
 
   module ClassMethods
     def memoize(method_name, condition: nil, ttl: nil)
