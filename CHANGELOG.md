@@ -1,5 +1,15 @@
 ## [Unreleased]
 
+## [1.3.0] - 2020-02-10
+### Added
+- Allow memoization after including module with Memery. ([@AlexWayfer]) [#23]
+
+### Changed
+- Make `memoize` return the method name to allow chaining. ([@JelF]) [#22]
+
+### Fixed
+- Fix warnings in Ruby 2.7. ([@AlexWayfer]) [#19], [#25]
+
 ## [1.2.0] - 2019-10-19
 ### Added
 - Add `:ttl` option for `memoize` method ([@AlexWayfer]) [#11]
@@ -27,10 +37,12 @@
 [1.0.0]: https://github.com/tycooon/memery/compare/v0.6.0...v1.0.0
 [1.1.0]: https://github.com/tycooon/memery/compare/v1.0.0...v1.1.0
 [1.2.0]: https://github.com/tycooon/memery/compare/v1.1.0...v1.2.0
-[Unreleased]: https://github.com/tycooon/memery/compare/v1.2.0...HEAD
+[1.3.0]: https://github.com/tycooon/memery/compare/v1.2.0...v1.3.0
+[Unreleased]: https://github.com/tycooon/memery/compare/v1.3.0...HEAD
 
 [@tycooon]: https://github.com/tycooon
 [@AlexWayfer]: https://github.com/AlexWayfer
+[@JelF]: https://github.com/JelF
 
 [#3]: https://github.com/tycooon/memery/pull/3
 [#7]: https://github.com/tycooon/memery/pull/7
@@ -38,3 +50,7 @@
 [#11]: https://github.com/tycooon/memery/pull/11
 [#14]: https://github.com/tycooon/memery/pull/14
 [#17]: https://github.com/tycooon/memery/pull/17
+[#19]: https://github.com/tycooon/memery/pull/19
+[#22]: https://github.com/tycooon/memery/pull/22
+[#23]: https://github.com/tycooon/memery/pull/23
+[#25]: https://github.com/tycooon/memery/pull/25
