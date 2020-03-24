@@ -247,6 +247,28 @@ RSpec.describe Memery do
     end
   end
 
+  context "module with self.included method defined" do
+    subject(:c) { C.new }
+
+    before { C.include(some_mixin) }
+
+    let(:some_mixin) do
+      Module.new do
+        extend ActiveSupport::Concern
+        include Memery
+
+        included do
+          attr_accessor :a
+        end
+      end
+    end
+
+    it "doesn't override existing method" do
+      c.a = 15
+      expect(c.a).to eq(15)
+    end
+  end
+
   context "class method with args" do
     subject(:d) { D }
 
