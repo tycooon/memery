@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+### Fixed
+- Fix compatibility with `ActiveSupport::Concern`. (revert [#23])
+
 ## [1.3.0] - 2020-02-10
 ### Added
 - Allow memoization after including module with Memery. ([@AlexWayfer]) [#23]

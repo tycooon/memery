@@ -6,20 +6,15 @@ require "memery/version"
 
 module Memery
   class << self
+    def included(base)
+      base.extend(ClassMethods)
+      base.include(InstanceMethods)
+    end
+
     def monotonic_clock
       Process.clock_gettime(Process::CLOCK_MONOTONIC)
     end
   end
-
-  module ModuleMethods
-    def included(base)
-      base.extend(ClassMethods)
-      base.include(InstanceMethods)
-      base.extend ModuleMethods if base.instance_of?(Module)
-    end
-  end
-
-  extend ModuleMethods
 
   module ClassMethods
     def memoize(method_name, condition: nil, ttl: nil)
@@ -32,16 +27,14 @@ module Memery
       return false unless defined?(@_memery_module)
 
       @_memery_module.method_defined?(method_name) ||
-        @_memery_module.private_method_defined?(method_name)
+      @_memery_module.private_method_defined?(method_name)
     end
 
     private
 
     def prepend_memery_module!
       return if defined?(@_memery_module)
-      @_memery_module = Module.new do
-        extend MemoizationModule
-      end
+      @_memery_module = Module.new { extend MemoizationModule }
       prepend @_memery_module
     end
 
