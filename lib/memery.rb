@@ -6,15 +6,33 @@ require "memery/version"
 
 module Memery
   class << self
-    def included(base)
-      base.extend(ClassMethods)
-      base.include(InstanceMethods)
-    end
-
     def monotonic_clock
       Process.clock_gettime(Process::CLOCK_MONOTONIC)
     end
   end
+
+  OUR_BLOCK = lambda do
+    extend(ClassMethods)
+    include(InstanceMethods)
+    extend ModuleMethods if instance_of?(Module)
+  end
+
+  private_constant :OUR_BLOCK
+
+  module ModuleMethods
+    def included(base = nil, &block)
+      if base.nil? && block
+        super do
+          instance_exec(&block)
+          instance_exec(&OUR_BLOCK)
+        end
+      else
+        base.instance_exec(&OUR_BLOCK)
+      end
+    end
+  end
+
+  extend ModuleMethods
 
   module ClassMethods
     def memoize(method_name, condition: nil, ttl: nil)
