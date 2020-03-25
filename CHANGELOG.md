@@ -1,7 +1,7 @@
 ## [Unreleased]
 
 ### Fixed
-- Fix compatibility with `ActiveSupport::Concern`. (revert [#23])
+- Fix compatibility with `ActiveSupport::Concern`. ([@tycooon] and [@AlexWayfer]) [#26]
 
 ## [1.3.0] - 2020-02-10
 ### Added

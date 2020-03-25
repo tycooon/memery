@@ -89,6 +89,11 @@ end
 
 class C
   include M
+
+  memoize def m_class
+    CALLS << __method__
+    __method__
+  end
 end
 
 class D
@@ -244,6 +249,14 @@ RSpec.describe Memery do
       values = [c.m, c.m, c.m]
       expect(values).to eq([:m, :m, :m])
       expect(CALLS).to eq([:m])
+    end
+
+    context "memoization in class" do
+      specify do
+        values = [c.m_class, c.m_class, c.m_class]
+        expect(values).to eq([:m_class, :m_class, :m_class])
+        expect(CALLS).to eq([:m_class])
+      end
     end
   end
 
