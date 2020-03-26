@@ -11,11 +11,24 @@ module Memery
     end
   end
 
+  OUR_BLOCK = lambda do
+    extend(ClassMethods)
+    include(InstanceMethods)
+    extend ModuleMethods if instance_of?(Module)
+  end
+
+  private_constant :OUR_BLOCK
+
   module ModuleMethods
-    def included(base)
-      base.extend(ClassMethods)
-      base.include(InstanceMethods)
-      base.extend ModuleMethods if base.instance_of?(Module)
+    def included(base = nil, &block)
+      if base.nil? && block
+        super do
+          instance_exec(&block)
+          instance_exec(&OUR_BLOCK)
+        end
+      else
+        base.instance_exec(&OUR_BLOCK)
+      end
     end
   end
 
@@ -32,16 +45,14 @@ module Memery
       return false unless defined?(@_memery_module)
 
       @_memery_module.method_defined?(method_name) ||
-        @_memery_module.private_method_defined?(method_name)
+      @_memery_module.private_method_defined?(method_name)
     end
 
     private
 
     def prepend_memery_module!
       return if defined?(@_memery_module)
-      @_memery_module = Module.new do
-        extend MemoizationModule
-      end
+      @_memery_module = Module.new { extend MemoizationModule }
       prepend @_memery_module
     end
 
