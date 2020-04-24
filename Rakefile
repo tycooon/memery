@@ -10,5 +10,5 @@ RuboCop::RakeTask.new(:lint)
 task default: %i[lint spec]
 
 task :benchmark do
-  require_relative "./benchmark"
+  require_relative "benchmark"
 end

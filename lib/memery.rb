@@ -2,7 +2,7 @@
 
 require "ruby2_keywords"
 
-require "memery/version"
+require_relative "memery/version"
 
 module Memery
   class << self

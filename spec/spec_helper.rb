@@ -11,7 +11,7 @@ SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
 
 SimpleCov.start
 
-require "memery"
+require_relative "../lib/memery"
 require "active_support/concern"
 
 RSpec.configure do |config|
