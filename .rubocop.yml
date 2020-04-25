@@ -1,12 +1,28 @@
-inherit_gem:
-  rubocop-config-umbrellio: lib/rubocop.yml
+require:
+  - rubocop-performance
+  - rubocop-rspec
 
-AllCops:
-  DisplayCopNames: true
-  TargetRubyVersion: 2.5
+Layout/MultilineOperationIndentation:
+  EnforcedStyle: indented
+Layout/ArgumentAlignment:
+  EnforcedStyle: with_fixed_indentation
+Layout/SpaceAroundMethodCallOperator:
+  Enabled: true
 
-Naming/MethodParameterName:
-  AllowedNames: ["x", "y", "z"]
+Lint/RaiseException:
+  Enabled: true
+Lint/StructNewOverride:
+  Enabled: true
 
-RSpec/EmptyLineAfterHook:
-  Enabled: false
+Style/ExponentialNotation:
+  Enabled: true
+Style/HashEachMethods:
+  Enabled: true
+Style/HashTransformKeys:
+  Enabled: true
+Style/HashTransformValues:
+  Enabled: true
+
+Metrics/BlockLength:
+  Exclude:
+    - spec/**/*

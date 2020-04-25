@@ -20,19 +20,19 @@ class A
     m_protected
   end
 
-  memoize def m_args(x, y)
-    CALLS << [x, y]
-    [x, y]
+  memoize def m_args(first, second)
+    CALLS << [first, second]
+    [first, second]
   end
 
-  memoize def m_kwargs(x, y: 42)
-    CALLS << [x, y]
-    [x, y]
+  memoize def m_kwargs(first, second: 42)
+    CALLS << [first, second]
+    [first, second]
   end
 
-  memoize def m_double_splat(x, **kwargs)
-    CALLS << [x, kwargs]
-    [x, kwargs]
+  memoize def m_double_splat(first, **kwargs)
+    CALLS << [first, kwargs]
+    [first, kwargs]
   end
 
   def m_condition
@@ -40,11 +40,11 @@ class A
     __method__
   end
 
-  memoize :m_condition, condition: -> { environment == "production" }
+  memoize :m_condition, condition: -> { environment == 'production' }
 
-  def m_ttl(x, y)
-    CALLS << [x, y]
-    [x, y]
+  def m_ttl(first, second)
+    CALLS << [first, second]
+    [first, second]
   end
 
   memoize :m_ttl, ttl: 3
@@ -65,8 +65,8 @@ class A
 end
 
 class B < A
-  memoize def m_args(x, y)
-    B_CALLS << [x, y]
+  memoize def m_args(first, second)
+    B_CALLS << [first, second]
     super(1, 2)
     100
   end
@@ -100,9 +100,9 @@ class D
   class << self
     include Memery
 
-    memoize def m_args(x, y)
-      CALLS << [x, y]
-      [x, y]
+    memoize def m_args(first, second)
+      CALLS << [first, second]
+      [first, second]
     end
   end
 end
@@ -137,35 +137,62 @@ end
 RSpec.describe Memery do
   subject(:a) { A.new }
 
-  before { CALLS.clear }
-  before { B_CALLS.clear }
+  before do
+    CALLS.clear
+    B_CALLS.clear
+  end
 
-  context "methods without args" do
-    specify do
-      values = [ a.m, a.m_nil, a.m, a.m_nil ]
-      expect(values).to eq([:m, nil, :m, nil])
-      expect(CALLS).to eq([:m, nil])
+  shared_examples 'correct values and calls' do
+    describe 'values' do
+      subject { values }
+
+      it { is_expected.to eq expected_values }
+    end
+
+    describe 'calls' do
+      subject { CALLS }
+
+      before do
+        values
+      end
+
+      it { is_expected.to eq expected_calls }
     end
   end
 
-  context "flushing cache" do
-    specify do
-      values = [ a.m, a.m ]
+  context 'when methods without args' do
+    let(:values) { [a.m, a.m_nil, a.m, a.m_nil] }
+
+    let(:expected_values) { [:m, nil, :m, nil] }
+    let(:expected_calls) { [:m, nil] }
+
+    include_examples 'correct values and calls'
+  end
+
+  describe 'flushing cache' do
+    before do
+      values
       a.clear_memery_cache!
       values << a.m
-      expect(values).to eq([:m, :m, :m])
-      expect(CALLS).to eq([:m, :m])
     end
+
+    let(:values) { [a.m, a.m] }
+
+    let(:expected_values) { %i[m m m] }
+    let(:expected_calls) { %i[m m] }
+
+    include_examples 'correct values and calls'
   end
 
-  context "method with args" do
-    specify do
-      values = [ a.m_args(1, 1), a.m_args(1, 1), a.m_args(1, 2) ]
-      expect(values).to eq([[1, 1], [1, 1], [1, 2]])
-      expect(CALLS).to eq([[1, 1], [1, 2]])
-    end
+  context 'when method with args' do
+    let(:values) { [a.m_args(1, 1), a.m_args(1, 1), a.m_args(1, 2)] }
 
-    context "receiving Hash-like object" do
+    let(:expected_values) { [[1, 1], [1, 1], [1, 2]] }
+    let(:expected_calls) { [[1, 1], [1, 2]] }
+
+    include_examples 'correct values and calls'
+
+    context 'when receiving Hash-like object' do
       let(:object_class) do
         Struct.new(:first_name, :last_name) do
           # For example, Sequel models have such implicit coercion,
@@ -174,56 +201,81 @@ RSpec.describe Memery do
         end
       end
 
-      let(:object) { object_class.new("John", "Wick") }
+      let(:object) { object_class.new('John', 'Wick') }
 
-      specify do
-        values = [ a.m_args(1, object), a.m_args(1, object), a.m_args(1, 2) ]
-        expect(values).to eq([[1, object], [1, object], [1, 2]])
-        expect(CALLS).to eq([[1, object], [1, 2]])
+      let(:values) do
+        [a.m_args(1, object), a.m_args(1, object), a.m_args(1, 2)]
       end
+
+      let(:expected_values) { [[1, object], [1, object], [1, 2]] }
+      let(:expected_calls) { [[1, object], [1, 2]] }
+
+      include_examples 'correct values and calls'
     end
   end
 
-  context "method with keyword args" do
-    specify do
-      values = [ a.m_kwargs(1, y: 2), a.m_kwargs(1, y: 2), a.m_kwargs(1, y: 3) ]
-      expect(values).to eq([[1, 2], [1, 2], [1, 3]])
-      expect(CALLS).to eq([[1, 2], [1, 3]])
+  context 'when method with keyword args' do
+    let(:values) do
+      [
+        a.m_kwargs(1, second: 2),
+        a.m_kwargs(1, second: 2),
+        a.m_kwargs(1, second: 3)
+      ]
     end
+
+    let(:expected_values) { [[1, 2], [1, 2], [1, 3]] }
+    let(:expected_calls) { [[1, 2], [1, 3]] }
+
+    include_examples 'correct values and calls'
   end
 
-  context "method with double splat argument" do
-    specify do
-      values = [ a.m_double_splat(1, y: 2), a.m_double_splat(1, y: 2), a.m_double_splat(1, y: 3) ]
-      expect(values).to eq([[1, { y: 2 }], [1, { y: 2 }], [1, { y: 3 }]])
-      expect(CALLS).to eq([[1, { y: 2 }], [1, { y: 3 }]])
+  context 'when method with double splat argument' do
+    let(:values) do
+      [
+        a.m_double_splat(1, second: 2),
+        a.m_double_splat(1, second: 2),
+        a.m_double_splat(1, second: 3)
+      ]
     end
+
+    let(:expected_values) do
+      [[1, { second: 2 }], [1, { second: 2 }], [1, { second: 3 }]]
+    end
+
+    let(:expected_calls) do
+      [[1, { second: 2 }], [1, { second: 3 }]]
+    end
+
+    include_examples 'correct values and calls'
   end
 
-  context "calling method with block" do
-    specify do
-      values = []
+  context 'when calling method with block' do
+    let(:values) { [] }
+
+    let(:expected_values) { [[1, 1], [1, 1]] }
+    let(:expected_calls) { [[1, 1], [1, 1]] }
+
+    before do
       values << a.m_args(1, 1) {}
       values << a.m_args(1, 1) {}
-
-      expect(values).to eq([[1, 1], [1, 1]])
-      expect(CALLS).to eq([[1, 1], [1, 1]])
     end
+
+    include_examples 'correct values and calls'
   end
 
-  context "calling private method" do
+  context 'when calling private method' do
     specify do
       expect { a.m_private }.to raise_error(NoMethodError, /private method/)
     end
   end
 
-  context "calling protected method" do
+  context 'when calling protected method' do
     specify do
       expect { a.m_protected }.to raise_error(NoMethodError, /protected method/)
     end
   end
 
-  context "Chaining macros" do
+  describe 'chaining macros' do
     subject(:g) { G.new }
 
     specify do
@@ -231,36 +283,50 @@ RSpec.describe Memery do
     end
   end
 
-  context "inherited class" do
+  context 'when class is inherited' do
     subject(:b) { B.new }
 
-    specify do
-      values = [ b.m_args(1, 1), b.m_args(1, 2), b.m_args(1, 1) ]
-      expect(values).to eq([100, 100, 100])
-      expect(CALLS).to eq([[1, 2]])
-      expect(B_CALLS).to eq([[1, 1], [1, 2]])
+    before do
+      values
+    end
+
+    let(:values) do
+      [b.m_args(1, 1), b.m_args(1, 2), b.m_args(1, 1)]
+    end
+
+    let(:expected_values) { [100, 100, 100] }
+    let(:expected_calls) { [[1, 2]] }
+
+    include_examples 'correct values and calls'
+
+    describe 'B calls' do
+      subject { B_CALLS }
+
+      it { is_expected.to eq [[1, 1], [1, 2]] }
     end
   end
 
-  context "module" do
+  context 'when memoization from included module' do
     subject(:c) { C.new }
 
-    specify do
-      values = [c.m, c.m, c.m]
-      expect(values).to eq([:m, :m, :m])
-      expect(CALLS).to eq([:m])
-    end
+    let(:values) { [c.m, c.m, c.m] }
 
-    context "memoization in class" do
-      specify do
-        values = [c.m_class, c.m_class, c.m_class]
-        expect(values).to eq([:m_class, :m_class, :m_class])
-        expect(CALLS).to eq([:m_class])
-      end
+    let(:expected_values) { %i[m m m] }
+    let(:expected_calls) { %i[m] }
+
+    include_examples 'correct values and calls'
+
+    context 'when memoization in class' do
+      let(:values) { [c.m_class, c.m_class, c.m_class] }
+
+      let(:expected_values) { %i[m_class m_class m_class] }
+      let(:expected_calls) { %i[m_class] }
+
+      include_examples 'correct values and calls'
     end
   end
 
-  context "module with self.included method defined" do
+  context 'when module with `self.included` method defined' do
     subject(:c) { C.new }
 
     before { C.include(some_mixin) }
@@ -276,23 +342,29 @@ RSpec.describe Memery do
       end
     end
 
-    it "doesn't override existing method" do
+    it 'does not override existing method' do
       c.a = 15
       expect(c.a).to eq(15)
     end
   end
 
-  context "class method with args" do
+  context 'with class method with args' do
     subject(:d) { D }
 
-    specify do
-      values = [ d.m_args(1, 1), d.m_args(1, 1), d.m_args(1, 2) ]
-      expect(values).to eq([[1, 1], [1, 1], [1, 2]])
-      expect(CALLS).to eq([[1, 1], [1, 2]])
+    before do
+      ## Memoizing in class cache globally, between tests
+      d.clear_memery_cache!
     end
+
+    let(:values) { [d.m_args(1, 1), d.m_args(1, 1), d.m_args(1, 2)] }
+
+    let(:expected_values) { [[1, 1], [1, 1], [1, 2]] }
+    let(:expected_calls) { [[1, 1], [1, 2]] }
+
+    include_examples 'correct values and calls'
   end
 
-  context "memoizing inexistent method" do
+  context 'when method does not exist' do
     subject(:klass) do
       Class.new do
         include Memery
@@ -301,123 +373,133 @@ RSpec.describe Memery do
     end
 
     specify do
-      expect { klass }.to raise_error(ArgumentError, /Method foo is not defined/)
+      expect { klass }.to raise_error(
+        ArgumentError, /Method foo is not defined/
+      )
     end
   end
 
-  context "Forwardable" do
+  context 'when method is forwarded' do
     subject(:e) { E.new }
 
-    specify do
-      values = [e.m, e.m, e.m]
-      expect(values).to eq([:m, :m, :m])
-      expect(CALLS).to eq([:m])
-    end
+    let(:values) { [e.m, e.m, e.m] }
+
+    let(:expected_values) { %i[m m m] }
+    let(:expected_calls) { %i[m] }
+
+    include_examples 'correct values and calls'
   end
 
-  describe ":condition option" do
+  describe ':condition option' do
     before do
       a.environment = environment
     end
 
-    context "returns true" do
-      let(:environment) { "production" }
+    context 'when returns true' do
+      let(:environment) { 'production' }
 
-      specify do
-        values = [ a.m_condition, a.m_nil, a.m_condition, a.m_nil ]
-        expect(values).to eq([:m_condition, nil, :m_condition, nil])
-        expect(CALLS).to eq([:m_condition, nil])
-      end
+      let(:values) { [a.m_condition, a.m_nil, a.m_condition, a.m_nil] }
+
+      let(:expected_values) { [:m_condition, nil, :m_condition, nil] }
+      let(:expected_calls) { [:m_condition, nil] }
+
+      include_examples 'correct values and calls'
     end
 
-    context "returns false" do
-      let(:environment) { "development" }
+    context 'when returns false' do
+      let(:environment) { 'development' }
 
-      specify do
-        values = [ a.m_condition, a.m_nil, a.m_condition, a.m_nil ]
-        expect(values).to eq([:m_condition, nil, :m_condition, nil])
-        expect(CALLS).to eq([:m_condition, nil, :m_condition])
-      end
-    end
-  end
+      let(:values) { [a.m_condition, a.m_nil, a.m_condition, a.m_nil] }
 
-  describe ":ttl option" do
-    specify do
-      values = [ a.m_ttl(1, 1), a.m_ttl(1, 1), a.m_ttl(1, 2) ]
-      expect(values).to eq([[1, 1], [1, 1], [1, 2]])
-      expect(CALLS).to eq([[1, 1], [1, 2]])
+      let(:expected_values) { [:m_condition, nil, :m_condition, nil] }
+      let(:expected_calls) { [:m_condition, nil, :m_condition] }
 
-      allow(Process).to receive(:clock_gettime).with(Process::CLOCK_MONOTONIC)
-        .and_wrap_original { |m, *args| m.call(*args) + 5 }
-
-      values = [ a.m_ttl(1, 1), a.m_ttl(1, 1), a.m_ttl(1, 2) ]
-      expect(values).to eq([[1, 1], [1, 1], [1, 2]])
-      expect(CALLS).to eq([[1, 1], [1, 2], [1, 1], [1, 2]])
-    end
-
-    context "returns false" do
-      let(:environment) { "development" }
-
-      specify do
-        values = [ a.m_condition, a.m_nil, a.m_condition, a.m_nil ]
-        expect(values).to eq([:m_condition, nil, :m_condition, nil])
-        expect(CALLS).to eq([:m_condition, nil, :m_condition])
-      end
+      include_examples 'correct values and calls'
     end
   end
 
-  describe ".memoized?" do
+  describe ':ttl option' do
+    def calculate_values
+      [a.m_ttl(1, 1), a.m_ttl(1, 1), a.m_ttl(1, 2)]
+    end
+
+    let(:values) { calculate_values }
+
+    let(:expected_values) { [[1, 1], [1, 1], [1, 2]] }
+    let(:expected_calls) { [[1, 1], [1, 2]] }
+
+    include_examples 'correct values and calls'
+
+    context 'when ttl has expired' do
+      before do
+        values
+
+        allow(Process).to(
+          receive(:clock_gettime).with(Process::CLOCK_MONOTONIC)
+            .and_wrap_original { |m, *args| m.call(*args) + 5 }
+        )
+
+        calculate_values
+      end
+
+      let(:expected_calls) { [[1, 1], [1, 2], [1, 1], [1, 2]] }
+
+      include_examples 'correct values and calls'
+    end
+  end
+
+  describe '.memoized?' do
     subject { object.memoized?(method_name) }
 
-    context "class without memoized methods" do
+    context 'when class without memoized methods' do
       let(:object) { F }
       let(:method_name) { :m }
 
       it { is_expected.to be false }
     end
 
-    shared_examples "works correctly" do
-      context "public memoized method" do
+    shared_examples 'works correctly' do
+      context 'with public memoized method' do
         let(:method_name) { :m }
 
         it { is_expected.to be true }
       end
 
-      context "private memoized method" do
+      context 'with private memoized method' do
         let(:method_name) { :m_private }
 
         it { is_expected.to be true }
       end
 
-      context "non-memoized method" do
+      context 'with non-memoized method' do
         let(:method_name) { :not_memoized }
 
         it { is_expected.to be false }
       end
 
-      context "standard class method" do
+      context 'with standard class method' do
         let(:method_name) { :constants }
 
         it { is_expected.to be false }
       end
 
-      context "standard instance method" do
+      context 'with standard instance method' do
         let(:method_name) { :to_s }
 
         it { is_expected.to be false }
       end
     end
 
-    context "class" do
+    context 'with class' do
       let(:object) { A }
 
-      include_examples "works correctly"
+      include_examples 'works correctly'
     end
 
-    context "module" do
+    context 'with module' do
       let(:object) { M }
 
-      include_examples "works correctly"
+      include_examples 'works correctly'
     end
   end
 end

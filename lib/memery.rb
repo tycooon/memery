@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
-require "ruby2_keywords"
+require 'ruby2_keywords'
 
-require_relative "memery/version"
+require_relative 'memery/version'
 
+## Module for memoization
 module Memery
   class << self
     def monotonic_clock
@@ -19,6 +20,8 @@ module Memery
 
   private_constant :OUR_BLOCK
 
+  ## Moudle for module methods,
+  ## when the root module is included into some module
   module ModuleMethods
     def included(base = nil, &block)
       if base.nil? && block
@@ -34,6 +37,7 @@ module Memery
 
   extend ModuleMethods
 
+  ## Module for class methods
   module ClassMethods
     def memoize(method_name, condition: nil, ttl: nil)
       prepend_memery_module!
@@ -45,13 +49,14 @@ module Memery
       return false unless defined?(@_memery_module)
 
       @_memery_module.method_defined?(method_name) ||
-      @_memery_module.private_method_defined?(method_name)
+        @_memery_module.private_method_defined?(method_name)
     end
 
     private
 
     def prepend_memery_module!
-      return if defined?(@_memery_module)
+      return if defined? @_memery_module
+
       @_memery_module = Module.new { extend MemoizationModule }
       prepend @_memery_module
     end
@@ -60,6 +65,7 @@ module Memery
       @_memery_module.public_send __method__, self, *args, **kwargs
     end
 
+    ## Base module for memoization
     module MemoizationModule
       def define_memoized_method!(klass, method_name, condition: nil, ttl: nil)
         method_key = "#{method_name}_#{object_id}"
@@ -74,7 +80,7 @@ module Memery
           store = (@_memery_memoized_values ||= {})[method_key] ||= {}
 
           if store.key?(args) &&
-            (ttl.nil? || Memery.monotonic_clock <= store[args][:time] + ttl)
+              (ttl.nil? || Memery.monotonic_clock <= store[args][:time] + ttl)
             return store[args][:result]
           end
 
@@ -99,7 +105,8 @@ module Memery
         elsif klass.public_method_defined?(method_name)
           :public
         else
-          raise ArgumentError, "Method #{method_name} is not defined on #{klass}"
+          raise ArgumentError,
+            "Method #{method_name} is not defined on #{klass}"
         end
       end
     end
@@ -107,6 +114,7 @@ module Memery
     private_constant :MemoizationModule
   end
 
+  ## Module for instance methods
   module InstanceMethods
     def clear_memery_cache!
       @_memery_memoized_values = {}
