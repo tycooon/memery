@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
 
   spec.add_runtime_dependency "ruby2_keywords", "~> 0.0.2"
 
-  spec.add_development_dependency "activesupport", "~> 5.0"
+  spec.add_development_dependency "activesupport", "~> 6.0"
   spec.add_development_dependency "benchmark-ips"
   spec.add_development_dependency "benchmark-memory"
   spec.add_development_dependency "bundler"
