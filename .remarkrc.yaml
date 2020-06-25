@@ -1,0 +1,4 @@
+plugins:
+  - remark-preset-lint-recommended
+  - - lint-maximum-line-length
+    - 100

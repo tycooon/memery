@@ -1,20 +1,14 @@
 # frozen_string_literal: true
 
-require 'bundler/setup'
-
 require 'pry-byebug'
 
 require 'simplecov'
-require 'coveralls'
-
-SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new(
-  [
-    SimpleCov::Formatter::HTMLFormatter,
-    Coveralls::SimpleCov::Formatter
-  ]
-)
-
 SimpleCov.start
+
+if ENV['CODECOV_TOKEN']
+  require 'codecov'
+  SimpleCov.formatter = SimpleCov::Formatter::Codecov
+end
 
 require_relative '../lib/memery'
 require 'active_support/concern'
