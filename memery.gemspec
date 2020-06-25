@@ -3,19 +3,20 @@
 require_relative 'lib/memery/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = 'memery'
+  spec.name          = 'alt_memery'
   spec.version       = Memery::VERSION
-  spec.authors       = ['Yuri Smirnov']
-  spec.email         = ['tycooon@yandex.ru']
+  spec.authors       = ['Yuri Smirnov', 'Alexander Popov']
+  spec.email         = ['alex.wayfer@gmail.com']
 
   spec.summary       = 'A gem for memoization.'
-  spec.description   = 'Memery is a gem for memoization.'
-  spec.homepage      = 'https://github.com/tycooon/memery'
+  spec.description   = <<~TEXT
+    Alt Memery is a gem for memoization.
+    It's a fork of Memery with implementation via `UnboundMethod` instead of `prepend Module`.
+  TEXT
+  spec.homepage      = 'https://github.com/AlexWayfer/alt_memery'
   spec.license       = 'MIT'
 
-  spec.files         = `git ls-files -z`.split("\x0").reject do |f|
-    f.match(%r{^(test|spec|features)/})
-  end
+  spec.files         = Dir['lib/**/*.rb', 'README.md', 'LICENSE.txt', 'CHANGELOG.md']
   spec.require_paths = ['lib']
 
   spec.add_runtime_dependency 'ruby2_keywords', '~> 0.0.2'
