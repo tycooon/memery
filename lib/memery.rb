@@ -10,6 +10,18 @@ module Memery
     def monotonic_clock
       Process.clock_gettime(Process::CLOCK_MONOTONIC)
     end
+
+    def method_visibility(klass, method_name)
+      if klass.private_method_defined?(method_name)
+        :private
+      elsif klass.protected_method_defined?(method_name)
+        :protected
+      elsif klass.public_method_defined?(method_name)
+        :public
+      else
+        raise ArgumentError, "Method #{method_name} is not defined on #{klass}"
+      end
+    end
   end
 
   OUR_BLOCK = lambda do
@@ -39,79 +51,46 @@ module Memery
 
   ## Module for class methods
   module ClassMethods
+    def memoized_methods
+      @memoized_methods ||= {}
+    end
+
     def memoize(method_name, condition: nil, ttl: nil)
-      prepend_memery_module!
-      define_memoized_method!(method_name, condition: condition, ttl: ttl)
+      original_visibility = Memery.method_visibility(self, method_name)
+
+      original_method = memoized_methods[method_name] = instance_method(method_name)
+
+      undef_method method_name
+
+      define_method method_name do |*args, &block|
+        if block || (condition && !instance_exec(&condition))
+          return original_method.bind(self).call(*args, &block)
+        end
+
+        method_key = "#{method_name}_#{original_method.object_id}"
+
+        store = (@_memery_memoized_values ||= {})[method_key] ||= {}
+
+        if store.key?(args) && (ttl.nil? || Memery.monotonic_clock <= store[args][:time] + ttl)
+          return store[args][:result]
+        end
+
+        result = original_method.bind(self).call(*args)
+        @_memery_memoized_values[method_key][args] =
+          { result: result, time: Memery.monotonic_clock }
+        result
+      end
+
+      ruby2_keywords method_name
+
+      send original_visibility, method_name
+
       method_name
     end
 
     def memoized?(method_name)
-      return false unless defined?(@_memery_module)
-
-      @_memery_module.method_defined?(method_name) ||
-        @_memery_module.private_method_defined?(method_name)
+      memoized_methods.key?(method_name)
     end
-
-    private
-
-    def prepend_memery_module!
-      return if defined? @_memery_module
-
-      @_memery_module = Module.new { extend MemoizationModule }
-      prepend @_memery_module
-    end
-
-    def define_memoized_method!(*args, **kwargs)
-      @_memery_module.public_send __method__, self, *args, **kwargs
-    end
-
-    ## Base module for memoization
-    module MemoizationModule
-      def define_memoized_method!(klass, method_name, condition: nil, ttl: nil)
-        method_key = "#{method_name}_#{object_id}"
-
-        original_visibility = method_visibility(klass, method_name)
-
-        define_method method_name do |*args, &block|
-          if block || (condition && !instance_exec(&condition))
-            return super(*args, &block)
-          end
-
-          store = (@_memery_memoized_values ||= {})[method_key] ||= {}
-
-          if store.key?(args) &&
-              (ttl.nil? || Memery.monotonic_clock <= store[args][:time] + ttl)
-            return store[args][:result]
-          end
-
-          result = super(*args)
-          @_memery_memoized_values[method_key][args] =
-            { result: result, time: Memery.monotonic_clock }
-          result
-        end
-
-        ruby2_keywords method_name
-
-        send original_visibility, method_name
-      end
-
-      private
-
-      def method_visibility(klass, method_name)
-        if klass.private_method_defined?(method_name)
-          :private
-        elsif klass.protected_method_defined?(method_name)
-          :protected
-        elsif klass.public_method_defined?(method_name)
-          :public
-        else
-          raise ArgumentError,
-            "Method #{method_name} is not defined on #{klass}"
-        end
-      end
-    end
-
-    private_constant :MemoizationModule
   end
 
   ## Module for instance methods

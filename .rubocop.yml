@@ -6,12 +6,20 @@ Layout/MultilineOperationIndentation:
   EnforcedStyle: indented
 Layout/ArgumentAlignment:
   EnforcedStyle: with_fixed_indentation
+Layout/LineLength:
+  Max: 100
 Layout/SpaceAroundMethodCallOperator:
+  Enabled: true
+Layout/EmptyLinesAroundAttributeAccessor:
   Enabled: true
 
 Lint/RaiseException:
   Enabled: true
 Lint/StructNewOverride:
+  Enabled: true
+Lint/DeprecatedOpenSSLConstant:
+  Enabled: true
+Lint/MixedRegexpCaptureTypes:
   Enabled: true
 
 Style/ExponentialNotation:
@@ -21,6 +29,14 @@ Style/HashEachMethods:
 Style/HashTransformKeys:
   Enabled: true
 Style/HashTransformValues:
+  Enabled: true
+Style/RedundantFetchBlock:
+  Enabled: true
+Style/RedundantRegexpCharacterClass:
+  Enabled: true
+Style/RedundantRegexpEscape:
+  Enabled: true
+Style/SlicingWithRange:
   Enabled: true
 
 Metrics/BlockLength:
