@@ -7,10 +7,13 @@
     See discussion here: <https://github.com/tycooon/memery/pull/1>.
 *   Delete `Gemfile.lock` and lock dependencies versions in `gemspec`.
 *   Update dependencies.
-    Unmaintained `coveralls` replaced with `coveralls_reborn` fork.
+    Unmaintained `coveralls` replaced with `codecov`.
+    `bundler` dependency dropped with `Rakefile`.
 *   Replace `require` with `require_relative`.
 *   Replace Umbrella styles with standard RuboCop.
 *   Improve README.
+*   Replace Travis CI with Cirrus CI.
+    You can see discussion here: <https://github.com/tycooon/memery/issues/28>.
 *   Add `remark` CI task for linting Markdown.
 *   Delete `benchmark.rb`.
     You can find improving example here: <https://gist.github.com/AlexWayfer/37ebb8b9f3429650b86fb4cea7ae3693>.

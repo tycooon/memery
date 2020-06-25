@@ -5,8 +5,10 @@
 /pkg/
 /spec/reports/
 /tmp/
+/node_modules/
 .ruby-version
 Gemfile.lock
+yarn.lock
 .benchmark.rb
 
 # rspec failure tracking
