@@ -1,59 +1,49 @@
-## [Unreleased]
+# Changelog
 
-### Fixed
-- Fix compatibility with `ActiveSupport::Concern`. ([@tycooon] and [@AlexWayfer]) [#26]
+## Unreleased Alt Memery
 
-## [1.3.0] - 2020-02-10
-### Added
-- Allow memoization after including module with Memery. ([@AlexWayfer]) [#23]
+*   Rename gem.
+*   Rewrite implementation from `prepend Module` to `UnboundMethod`.
+    See discussion here: <https://github.com/tycooon/memery/pull/1>.
+*   Delete `Gemfile.lock` and lock dependencies versions in `gemspec`.
+*   Update dependencies.
+    Unmaintained `coveralls` replaced with `coveralls_reborn` fork.
+*   Replace `require` with `require_relative`.
+*   Replace Umbrella styles with standard RuboCop.
+*   Improve README.
+*   Add `remark` CI task for linting Markdown.
+*   Delete `benchmark.rb`.
+    You can find improving example here: <https://gist.github.com/AlexWayfer/37ebb8b9f3429650b86fb4cea7ae3693>.
 
-### Changed
-- Make `memoize` return the method name to allow chaining. ([@JelF]) [#22]
+## Unreleased Memery
 
-### Fixed
-- Fix warnings in Ruby 2.7. ([@AlexWayfer]) [#19], [#25]
+*   Fix compatibility with `ActiveSupport::Concern`.
 
-## [1.2.0] - 2019-10-19
-### Added
-- Add `:ttl` option for `memoize` method ([@AlexWayfer]) [#11]
-- Add benchmark script ([@AlexWayfer]) [#14]
-- Add `.memoized?` method ([@AlexWayfer]) [#17]
+## 1.3.0 (2020-02-10)
 
-## [1.1.0] - 2019-08-05
-### Fixed
-- Optimize speed and memory for cached values returns. ([@AlexWayfer]) [#10]
+*   Allow memoization after including module with Memery.
+*   Make `memoize` return the method name to allow chaining.
+*   Fix warnings in Ruby 2.7.
 
-## [1.0.0] - 2018-08-31
-### Added
-- Add `:condition` option for `.memoize` method. ([@AlexWayfer]) [#7]
+## 1.2.0 (2019-10-19)
 
-## [0.6.0] - 2018-04-20
-### Added
-- Readme example for memoizing class methods. ([@AlexWayfer]) [#3]
-- Memery raises `ArgumentError` if method is not defined when you call `memoize`.
+*   Add `:ttl` option for `memoize` method.
+*   Add benchmark script.
+*   Add `.memoized?` method.
 
-## [0.5.0] - 2017-06-12
-- Initial public version.
+## 1.1.0 (2019-08-05)
 
-[0.5.0]: https://github.com/tycooon/memery/tree/v0.5.0
-[0.6.0]: https://github.com/tycooon/memery/compare/v0.5.0...v0.6.0
-[1.0.0]: https://github.com/tycooon/memery/compare/v0.6.0...v1.0.0
-[1.1.0]: https://github.com/tycooon/memery/compare/v1.0.0...v1.1.0
-[1.2.0]: https://github.com/tycooon/memery/compare/v1.1.0...v1.2.0
-[1.3.0]: https://github.com/tycooon/memery/compare/v1.2.0...v1.3.0
-[Unreleased]: https://github.com/tycooon/memery/compare/v1.3.0...HEAD
+*   Optimize speed and memory for cached values returns.
 
-[@tycooon]: https://github.com/tycooon
-[@AlexWayfer]: https://github.com/AlexWayfer
-[@JelF]: https://github.com/JelF
+## 1.0.0 (2018-08-31)
 
-[#3]: https://github.com/tycooon/memery/pull/3
-[#7]: https://github.com/tycooon/memery/pull/7
-[#10]: https://github.com/tycooon/memery/pull/10
-[#11]: https://github.com/tycooon/memery/pull/11
-[#14]: https://github.com/tycooon/memery/pull/14
-[#17]: https://github.com/tycooon/memery/pull/17
-[#19]: https://github.com/tycooon/memery/pull/19
-[#22]: https://github.com/tycooon/memery/pull/22
-[#23]: https://github.com/tycooon/memery/pull/23
-[#25]: https://github.com/tycooon/memery/pull/25
+*   Add `:condition` option for `.memoize` method.
+
+## 0.6.0 (2018-04-20)
+
+*   Add example of class methods memoization into README.
+*   Memery raises `ArgumentError` if method is not defined when you call `memoize`.
+
+## 0.5.0 (2017-06-12)
+
+*   Initial public version.
