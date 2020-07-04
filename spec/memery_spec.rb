@@ -170,18 +170,43 @@ RSpec.describe Memery do
   end
 
   describe 'flushing cache' do
-    before do
-      values
-      a.clear_memery_cache!
-      values << a.m
+    context 'without arguments' do
+      def double_a_m_call
+        [a.m, a.m]
+      end
+
+      before do
+        values
+        a.clear_memery_cache!
+        values.concat double_a_m_call
+      end
+
+      let(:values) { double_a_m_call }
+
+      let(:expected_values) { %i[m m m m] }
+      let(:expected_calls) { %i[m m] }
+
+      include_examples 'correct values and calls'
     end
 
-    let(:values) { [a.m, a.m] }
+    context 'with specific methods as arguments' do
+      def methods_calls
+        [a.m, a.m, a.m_args(1, 2), a.m_args(1, 2), a.m_nil, a.m_nil]
+      end
 
-    let(:expected_values) { %i[m m m] }
-    let(:expected_calls) { %i[m m] }
+      before do
+        values
+        a.clear_memery_cache! :m, :m_private, :m_nil, :m_protected, :m_kwargs
+        values.concat methods_calls
+      end
 
-    include_examples 'correct values and calls'
+      let(:values) { methods_calls }
+
+      let(:expected_values) { [:m, :m, [1, 2], [1, 2], nil, nil] * 2 }
+      let(:expected_calls) { [:m, [1, 2], nil, :m, nil] }
+
+      include_examples 'correct values and calls'
+    end
   end
 
   context 'when method with args' do
@@ -352,7 +377,8 @@ RSpec.describe Memery do
     subject(:d) { D }
 
     before do
-      ## Memoizing in class cache globally, between tests
+      ## HACK: Memoizing in class cache globally, between tests
+      ## Delete it with `stub_const`
       d.clear_memery_cache!
     end
 

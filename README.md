@@ -51,10 +51,10 @@ Note how both method's return values are cached separately and don't interfere w
 
 The other key difference is that it doesn't change method's arguments
 (no extra param like `reload`). If you need to get unmemoize result of method —
-just call the `#clear_memery_cache!` method with memoized method name:
+just call the `#clear_memery_cache!` method with needed memoized method names:
 
 ```ruby
-a.clear_memery_cache!(:foo)
+a.clear_memery_cache! :foo, :bar
 ```
 
 Without arguments, `#clear_memery_cache!` will clear the whole instance's cache.

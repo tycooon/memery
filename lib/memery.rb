@@ -71,16 +71,17 @@ module Memery
           return original_method.bind(self).call(*args, &block)
         end
 
-        method_key = "#{method_name}_#{original_method.object_id}"
+        method_object_id = original_method.object_id
 
-        store = (@_memery_memoized_values ||= {})[method_key] ||= {}
+        store =
+          ((@_memery_memoized_values ||= {})[method_name] ||= {})[method_object_id] ||= {}
 
         if store.key?(args) && (ttl.nil? || Memery.monotonic_clock <= store[args][:time] + ttl)
           return store[args][:result]
         end
 
         result = original_method.bind(self).call(*args)
-        @_memery_memoized_values[method_key][args] =
+        @_memery_memoized_values[method_name][method_object_id][args] =
           { result: result, time: Memery.monotonic_clock }
         result
       end
@@ -102,8 +103,12 @@ module Memery
 
   ## Module for instance methods
   module InstanceMethods
-    def clear_memery_cache!
-      @_memery_memoized_values = {}
+    def clear_memery_cache!(*method_names)
+      if method_names.any?
+        method_names.each { |method_name| @_memery_memoized_values[method_name]&.clear }
+      elsif defined? @_memery_memoized_values
+        @_memery_memoized_values.clear
+      end
     end
   end
 end
