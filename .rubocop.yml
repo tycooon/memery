@@ -42,3 +42,9 @@ Style/SlicingWithRange:
 Metrics/BlockLength:
   Exclude:
     - spec/**/*
+
+AllCops:
+  Exclude:
+  <% `git status --ignored --porcelain`.lines.grep(/^!! /).each do |path| %>
+    - <%= path.sub(/^!! /, '') %>
+  <% end %>
