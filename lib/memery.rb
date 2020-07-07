@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
+require 'module_methods'
 require 'ruby2_keywords'
 
 require_relative 'memery/version'
 
 ## Module for memoization
 module Memery
+  extend ::ModuleMethods::Extension
+
   class << self
     def monotonic_clock
       Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -23,31 +26,6 @@ module Memery
       end
     end
   end
-
-  OUR_BLOCK = lambda do
-    extend(ClassMethods)
-    include(InstanceMethods)
-    extend ModuleMethods if instance_of?(Module)
-  end
-
-  private_constant :OUR_BLOCK
-
-  ## Moudle for module methods,
-  ## when the root module is included into some module
-  module ModuleMethods
-    def included(base = nil, &block)
-      if base.nil? && block
-        super do
-          instance_exec(&block)
-          instance_exec(&OUR_BLOCK)
-        end
-      else
-        base.instance_exec(&OUR_BLOCK)
-      end
-    end
-  end
-
-  extend ModuleMethods
 
   ## Module for class methods
   module ClassMethods
@@ -101,14 +79,11 @@ module Memery
     end
   end
 
-  ## Module for instance methods
-  module InstanceMethods
-    def clear_memery_cache!(*method_names)
-      if method_names.any?
-        method_names.each { |method_name| @_memery_memoized_values[method_name]&.clear }
-      elsif defined? @_memery_memoized_values
-        @_memery_memoized_values.clear
-      end
+  def clear_memery_cache!(*method_names)
+    if method_names.any?
+      method_names.each { |method_name| @_memery_memoized_values[method_name]&.clear }
+    elsif defined? @_memery_memoized_values
+      @_memery_memoized_values.clear
     end
   end
 end

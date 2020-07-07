@@ -41,6 +41,7 @@ Style/SlicingWithRange:
 
 Metrics/BlockLength:
   Exclude:
+    - '*.gemspec'
     - spec/**/*
 
 AllCops:
