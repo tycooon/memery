@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'benchmark-ips', '~> 2.0'
   spec.add_development_dependency 'benchmark-memory', '~> 0.1.0'
 
-  spec.add_development_dependency 'codecov', '~> 0.1.0'
+  spec.add_development_dependency 'codecov', '~> 0.1.0', '< 0.1.18'
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'simplecov', '~> 0.18.0'
 
