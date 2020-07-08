@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased Alt Memery
+## master (unreleased)
+
+## 2.0.0 (2020-07-09)
 
 *   Rename gem.
 *   Rewrite implementation from `prepend Module` to `UnboundMethod`.
@@ -18,7 +20,7 @@
 *   Delete `benchmark.rb`.
     You can find improving example here: <https://gist.github.com/AlexWayfer/37ebb8b9f3429650b86fb4cea7ae3693>.
 
-## Unreleased Memery
+### Unreleased Memery
 
 *   Fix compatibility with `ActiveSupport::Concern`.
 
