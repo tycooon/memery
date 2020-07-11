@@ -1,5 +1,13 @@
 # Alt Memery
 
+[![Cirrus CI - Base Branch Build Status](https://img.shields.io/cirrus/github/AlexWayfer/alt_memery?style=flat-square)](https://cirrus-ci.com/github/AlexWayfer/alt_memery)
+[![Codecov branch](https://img.shields.io/codecov/c/github/AlexWayfer/alt_memery/master.svg?style=flat-square)](https://codecov.io/gh/AlexWayfer/alt_memery)
+[![Code Climate](https://img.shields.io/codeclimate/maintainability/AlexWayfer/alt_memery.svg?style=flat-square)](https://codeclimate.com/github/AlexWayfer/alt_memery)
+[![Depfu](https://img.shields.io/depfu/AlexWayfer/benchmark_toys?style=flat-square)](https://depfu.com/repos/github/AlexWayfer/alt_memery)
+[![Inline docs](https://inch-ci.org/github/AlexWayfer/alt_memery.svg?branch=master)](https://inch-ci.org/github/AlexWayfer/alt_memery)
+[![license](https://img.shields.io/github/license/AlexWayfer/alt_memery.svg?style=flat-square)](https://github.com/AlexWayfer/alt_memery/blob/master/LICENSE.txt)
+[![Gem](https://img.shields.io/gem/v/alt_memery.svg?style=flat-square)](https://rubygems.org/gems/alt_memery)
+
 Alt Memery allows to memoize methods return values.
 
 The native simplest memoization in Ruby looks like this:
