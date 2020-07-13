@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-require 'bundler/setup'
-Bundler.setup
+include :bundler, static: true
 
 require 'gem_toys'
 expand GemToys::Template,
