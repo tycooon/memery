@@ -37,6 +37,7 @@ module Memery
     # rubocop:disable Metrics/MethodLength
     # rubocop:disable Metrics/AbcSize
     # rubocop:disable Metrics/CyclomaticComplexity
+    # rubocop:disable Metrics/PerceivedComplexity
     def memoize(method_name, condition: nil, ttl: nil)
       original_visibility = Memery.method_visibility(self, method_name)
 
@@ -73,6 +74,7 @@ module Memery
     # rubocop:enable Metrics/MethodLength
     # rubocop:enable Metrics/AbcSize
     # rubocop:enable Metrics/CyclomaticComplexity
+    # rubocop:enable Metrics/PerceivedComplexity
 
     def memoized?(method_name)
       memoized_methods.key?(method_name)

@@ -19,6 +19,8 @@ Gem::Specification.new do |spec|
   spec.files         = Dir['lib/**/*.rb', 'README.md', 'LICENSE.txt', 'CHANGELOG.md']
   spec.require_paths = ['lib']
 
+  spec.required_ruby_version = '~> 2.5'
+
   spec.add_runtime_dependency 'module_methods', '~> 0.1.0'
   spec.add_runtime_dependency 'ruby2_keywords', '~> 0.0.2'
 
@@ -30,12 +32,12 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency 'codecov', '~> 0.2.0'
   spec.add_development_dependency 'rspec', '~> 3.0'
-  spec.add_development_dependency 'simplecov', '~> 0.18.0'
+  spec.add_development_dependency 'simplecov', '~> 0.19.0'
 
-  spec.add_development_dependency 'rubocop', '~> 0.88.0'
+  spec.add_development_dependency 'rubocop', '~> 0.93.0'
   spec.add_development_dependency 'rubocop-performance', '~> 1.5'
-  spec.add_development_dependency 'rubocop-rspec', '~> 1.38'
+  spec.add_development_dependency 'rubocop-rspec', '~> 1.44'
 
-  spec.add_development_dependency 'gem_toys', '~> 0.3.0'
-  spec.add_development_dependency 'toys', '~> 0.10.4'
+  spec.add_development_dependency 'gem_toys', '~> 0.4.0'
+  spec.add_development_dependency 'toys', '~> 0.11.0'
 end
