@@ -4,7 +4,8 @@
 	},
 	"devDependencies": {
 		"remark-cli": "^9.0.0",
-		"remark-lint-maximum-line-length": "^2.0.1",
-		"remark-preset-lint-recommended": "^4.0.0"
+		"remark-gfm": "^1.0.0",
+		"remark-lint-maximum-line-length": "^2.0.3",
+		"remark-preset-lint-recommended": "^5.0.0"
 	}
 }

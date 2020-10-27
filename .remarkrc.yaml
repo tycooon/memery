@@ -1,4 +1,5 @@
 plugins:
   - remark-preset-lint-recommended
+  - remark-gfm
   - - lint-maximum-line-length
     - 100
