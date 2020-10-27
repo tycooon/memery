@@ -3,7 +3,7 @@
 		"remark": "remark ."
 	},
 	"devDependencies": {
-		"remark-cli": "^8.0.0",
+		"remark-cli": "^9.0.0",
 		"remark-lint-maximum-line-length": "^2.0.1",
 		"remark-preset-lint-recommended": "^4.0.0"
 	}
