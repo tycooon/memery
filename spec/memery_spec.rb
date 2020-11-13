@@ -207,7 +207,7 @@ RSpec.describe Memery do
       define_base_class do
         memoize def memoized_method
           calls << __method__
-          42
+          block_given? ? yield : 42
         end
       end
     end
@@ -216,12 +216,12 @@ RSpec.describe Memery do
       [
         test_object.memoized_method,
         test_object.memoized_method,
-        test_object.memoized_method {},
+        test_object.memoized_method { 84 },
         test_object.memoized_method
       ]
     end
 
-    let(:expected_values) { [42, 42, 42, 42] }
+    let(:expected_values) { [42, 42, 84, 42] }
     let(:expected_calls) { %i[memoized_method memoized_method] }
 
     include_examples 'correct values and calls'
@@ -707,7 +707,7 @@ RSpec.describe Memery do
 
     context 'when class without memoized methods' do
       let(:test_class) do
-        define_base_class {}
+        define_base_class
       end
 
       let(:method_name) { :memoized_method }
