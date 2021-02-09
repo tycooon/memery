@@ -44,6 +44,7 @@ test_task:
       image: ruby:2.5
       image: ruby:2.6
       image: ruby:2.7
+      image: ruby:3.0
   <<: *bundle_cache
   environment:
     CODECOV_TOKEN: ENCRYPTED[b82868a5d8629f13ace2b788610b00a8beb6336bc8c5d81ea866b681c3f5c174460bcdbe5d5de9efced470b0d5981b32]
