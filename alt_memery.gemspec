@@ -19,7 +19,7 @@ Gem::Specification.new do |spec|
   spec.files         = Dir['lib/**/*.rb', 'README.md', 'LICENSE.txt', 'CHANGELOG.md']
   spec.require_paths = ['lib']
 
-  spec.required_ruby_version = '~> 2.5'
+  spec.required_ruby_version = '>= 2.5', '< 4'
 
   spec.add_runtime_dependency 'module_methods', '~> 0.1.0'
   spec.add_runtime_dependency 'ruby2_keywords', '~> 0.0.2'
