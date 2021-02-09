@@ -32,3 +32,5 @@ AllCops:
 
 RSpec/MultipleMemoizedHelpers:
   Enabled: false
+RSpec/NestedGroups:
+  Enabled: false

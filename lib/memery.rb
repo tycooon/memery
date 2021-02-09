@@ -82,9 +82,11 @@ module Memery
   end
 
   def clear_memery_cache!(*method_names)
+    return unless defined? @_memery_memoized_values
+
     if method_names.any?
       method_names.each { |method_name| @_memery_memoized_values[method_name]&.clear }
-    elsif defined? @_memery_memoized_values
+    else
       @_memery_memoized_values.clear
     end
   end

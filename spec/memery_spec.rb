@@ -623,16 +623,30 @@ RSpec.describe Memery do
         end
       end
 
-      let(:values) do
-        result = [test_object.memoized_method, test_object.memoized_method]
-        test_object.clear_memery_cache!
-        result.concat [test_object.memoized_method, test_object.memoized_method]
+      context 'without cache' do
+        let(:values) do
+          test_object.clear_memery_cache!
+          [test_object.memoized_method, test_object.memoized_method]
+        end
+
+        let(:expected_values) { [42, 42] }
+        let(:expected_calls) { %i[memoized_method] }
+
+        include_examples 'correct values and calls'
       end
 
-      let(:expected_values) { [42, 42, 42, 42] }
-      let(:expected_calls) { %i[memoized_method memoized_method] }
+      context 'with cache' do
+        let(:values) do
+          result = [test_object.memoized_method, test_object.memoized_method]
+          test_object.clear_memery_cache!
+          result.concat [test_object.memoized_method, test_object.memoized_method]
+        end
 
-      include_examples 'correct values and calls'
+        let(:expected_values) { [42, 42, 42, 42] }
+        let(:expected_calls) { %i[memoized_method memoized_method] }
+
+        include_examples 'correct values and calls'
+      end
     end
 
     context 'with specific methods as arguments' do
@@ -655,50 +669,93 @@ RSpec.describe Memery do
         end
       end
 
-      let(:values) do
-        result = make_calls
+      context 'without cache' do
+        let(:values) do
+          test_object.clear_memery_cache! :memoized_method, :yet_another_memoized_method
 
-        test_object.clear_memery_cache! :memoized_method, :yet_another_memoized_method
+          make_calls
+        end
 
-        result.concat make_calls
+        let(:expected_values) do
+          [
+            42, 42, [1, 2], [1, 2], [3, 4], [3, 4], [5, 6], [5, 6], [7, 8], [7, 8]
+          ]
+        end
+
+        let(:expected_calls) do
+          [
+            :memoized_method,
+            [1, 2],
+            [3, 4],
+            [5, 6],
+            [7, 8]
+          ]
+        end
+
+        def make_calls
+          [
+            test_object.memoized_method,
+            test_object.memoized_method,
+            test_object.another_memoized_method(1, 2),
+            test_object.another_memoized_method(1, 2),
+            test_object.another_memoized_method(3, 4),
+            test_object.another_memoized_method(3, 4),
+            test_object.yet_another_memoized_method(5, 6),
+            test_object.yet_another_memoized_method(5, 6),
+            test_object.yet_another_memoized_method(7, 8),
+            test_object.yet_another_memoized_method(7, 8)
+          ]
+        end
+
+        include_examples 'correct values and calls'
       end
 
-      let(:expected_values) do
-        [
-          42, 42, [1, 2], [1, 2], [3, 4], [3, 4], [5, 6], [5, 6], [7, 8], [7, 8],
-          42, 42, [1, 2], [1, 2], [3, 4], [3, 4], [5, 6], [5, 6], [7, 8], [7, 8]
-        ]
-      end
+      context 'with cache' do
+        let(:values) do
+          result = make_calls
 
-      let(:expected_calls) do
-        [
-          :memoized_method,
-          [1, 2],
-          [3, 4],
-          [5, 6],
-          [7, 8],
-          :memoized_method,
-          [5, 6],
-          [7, 8]
-        ]
-      end
+          test_object.clear_memery_cache! :memoized_method, :yet_another_memoized_method
 
-      def make_calls
-        [
-          test_object.memoized_method,
-          test_object.memoized_method,
-          test_object.another_memoized_method(1, 2),
-          test_object.another_memoized_method(1, 2),
-          test_object.another_memoized_method(3, 4),
-          test_object.another_memoized_method(3, 4),
-          test_object.yet_another_memoized_method(5, 6),
-          test_object.yet_another_memoized_method(5, 6),
-          test_object.yet_another_memoized_method(7, 8),
-          test_object.yet_another_memoized_method(7, 8)
-        ]
-      end
+          result.concat make_calls
+        end
 
-      include_examples 'correct values and calls'
+        let(:expected_values) do
+          [
+            42, 42, [1, 2], [1, 2], [3, 4], [3, 4], [5, 6], [5, 6], [7, 8], [7, 8],
+            42, 42, [1, 2], [1, 2], [3, 4], [3, 4], [5, 6], [5, 6], [7, 8], [7, 8]
+          ]
+        end
+
+        let(:expected_calls) do
+          [
+            :memoized_method,
+            [1, 2],
+            [3, 4],
+            [5, 6],
+            [7, 8],
+            :memoized_method,
+            [5, 6],
+            [7, 8]
+          ]
+        end
+
+        def make_calls
+          [
+            test_object.memoized_method,
+            test_object.memoized_method,
+            test_object.another_memoized_method(1, 2),
+            test_object.another_memoized_method(1, 2),
+            test_object.another_memoized_method(3, 4),
+            test_object.another_memoized_method(3, 4),
+            test_object.yet_another_memoized_method(5, 6),
+            test_object.yet_another_memoized_method(5, 6),
+            test_object.yet_another_memoized_method(7, 8),
+            test_object.yet_another_memoized_method(7, 8)
+          ]
+        end
+
+        include_examples 'correct values and calls'
+      end
     end
   end
 
