@@ -1,5 +1,6 @@
 ## [Unreleased]
 
+## [1.4.0] - 2021-03-15
 ### Fixed
 - Fix compatibility with `ActiveSupport::Concern`. ([@tycooon] and [@AlexWayfer]) [#26]
 
@@ -57,3 +58,4 @@
 [#22]: https://github.com/tycooon/memery/pull/22
 [#23]: https://github.com/tycooon/memery/pull/23
 [#25]: https://github.com/tycooon/memery/pull/25
+[#26]: https://github.com/tycooon/memery/pull/26
