@@ -25,22 +25,38 @@ class Foo
       ("a".."k").find { |letter| letter == char }
     end
 
+    memoize def find_z
+      base_find("z")
+    end
+
     memoize def find_new(char)
       base_find(char)
     end
   end
 end
 
-def test_memery
+def test_no_args
+  Foo.find_z
+end
+
+def test_with_args
   Foo.find_new("d")
 end
 
 Benchmark.ips do |x|
-  x.report("test_memery") { test_memery }
+  x.report("test_no_args") { test_no_args }
 end
 
 Benchmark.memory do |x|
-  x.report("test_memery") { 100.times { test_memery } }
+  x.report("test_no_args") { 100.times { test_no_args } }
+end
+
+Benchmark.ips do |x|
+  x.report("test_with_args") { test_with_args }
+end
+
+Benchmark.memory do |x|
+  x.report("test_with_args") { 100.times { test_with_args } }
 end
 
 puts "```"
