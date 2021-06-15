@@ -53,40 +53,47 @@ module Memery
     def prepend_memery_module!
       return if defined?(@_memery_module)
       @_memery_module = Module.new { extend MemoizationModule }
-      prepend @_memery_module
+      prepend(@_memery_module)
     end
 
-    def define_memoized_method!(*args, **kwargs)
-      @_memery_module.public_send __method__, self, *args, **kwargs
+    def define_memoized_method!(method_name, **options)
+      @_memery_module.define_memoized_method!(self, method_name, **options)
     end
 
     module MemoizationModule
+      Cache = Struct.new(:result, :time) do
+        def fresh?(ttl)
+          return true if ttl.nil?
+          Memery.monotonic_clock <= time + ttl
+        end
+      end
+
       def define_memoized_method!(klass, method_name, condition: nil, ttl: nil)
         method_key = "#{method_name}_#{object_id}"
 
         original_visibility = method_visibility(klass, method_name)
+        original_arity = klass.instance_method(method_name).arity
 
-        define_method method_name do |*args, &block|
+        define_method(method_name) do |*args, &block|
           if block || (condition && !instance_exec(&condition))
             return super(*args, &block)
           end
 
-          store = (@_memery_memoized_values ||= {})[method_key] ||= {}
+          cache_store = (@_memery_memoized_values ||= {})
+          cache_key = original_arity.zero? ? method_key : [method_key, *args]
+          cache = cache_store[cache_key]
 
-          if store.key?(args) &&
-            (ttl.nil? || Memery.monotonic_clock <= store[args][:time] + ttl)
-            return store[args][:result]
-          end
+          return cache.result if cache&.fresh?(ttl)
 
           result = super(*args)
-          @_memery_memoized_values[method_key][args] =
-            { result: result, time: Memery.monotonic_clock }
+          new_cache = Cache.new(result, Memery.monotonic_clock)
+          cache_store[cache_key] = new_cache
+
           result
         end
 
-        ruby2_keywords method_name
-
-        send original_visibility, method_name
+        ruby2_keywords(method_name)
+        send(original_visibility, method_name)
       end
 
       private
