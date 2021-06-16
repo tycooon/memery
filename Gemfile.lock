@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    memery (1.4.0)
+    memery (1.4.1)
       ruby2_keywords (~> 0.0.2)
 
 GEM
