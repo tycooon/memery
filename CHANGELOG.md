@@ -1,5 +1,8 @@
 ## [Unreleased]
 
+## [1.4.1] - 2021-06-16
+- Under-the-hood refactor & optimizations. ([@tycooon]) [bc503f3]
+
 ## [1.4.0] - 2021-03-15
 ### Fixed
 - Fix compatibility with `ActiveSupport::Concern`. ([@tycooon] and [@AlexWayfer]) [#26]
@@ -43,7 +46,8 @@
 [1.2.0]: https://github.com/tycooon/memery/compare/v1.1.0...v1.2.0
 [1.3.0]: https://github.com/tycooon/memery/compare/v1.2.0...v1.3.0
 [1.4.0]: https://github.com/tycooon/memery/compare/v1.3.0...v1.4.0
-[Unreleased]: https://github.com/tycooon/memery/compare/v1.4.0...HEAD
+[1.4.1]: https://github.com/tycooon/memery/compare/v1.4.0...v1.4.1
+[Unreleased]: https://github.com/tycooon/memery/compare/v1.4.1...HEAD
 
 [@tycooon]: https://github.com/tycooon
 [@AlexWayfer]: https://github.com/AlexWayfer
@@ -60,3 +64,4 @@
 [#23]: https://github.com/tycooon/memery/pull/23
 [#25]: https://github.com/tycooon/memery/pull/25
 [#26]: https://github.com/tycooon/memery/pull/26
+[bc503f3]: https://github.com/tycooon/memery/commit/bc503f36103a71245aa47aeb30225a48fb39438e

@@ -15,6 +15,7 @@ Gem::Specification.new do |spec|
   spec.summary       = "A gem for memoization."
   spec.description   = "Memery is a gem for memoization."
   spec.homepage      = "https://github.com/tycooon/memery"
+  spec.changelog_uri = "https://github.com/tycooon/memery/blob/master/CHANGELOG.md"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
