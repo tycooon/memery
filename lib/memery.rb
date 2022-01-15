@@ -35,10 +35,12 @@ module Memery
   extend ModuleMethods
 
   module ClassMethods
-    def memoize(method_name, condition: nil, ttl: nil)
+    def memoize(*method_names, condition: nil, ttl: nil)
       prepend_memery_module!
-      define_memoized_method!(method_name, condition: condition, ttl: ttl)
-      method_name
+      method_names.each do |method_name|
+        define_memoized_method!(method_name, condition: condition, ttl: ttl)
+      end
+      method_names.length > 1 ? method_names : method_names.first
     end
 
     def memoized?(method_name)

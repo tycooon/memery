@@ -134,11 +134,25 @@ class G
   macro memoize def g; end
 end
 
+
 RSpec.describe Memery do
   subject(:a) { A.new }
 
   before { CALLS.clear }
   before { B_CALLS.clear }
+
+  let(:h_nomemo_class) do
+    Class.new do
+      include Memery
+
+      [:a, :b, :m, :n, :x, :y].each do |name|
+        define_method(name) do
+          CALLS << name
+          name
+        end
+      end
+    end
+  end
 
   context "methods without args" do
     specify do
@@ -363,6 +377,55 @@ RSpec.describe Memery do
         expect(values).to eq([:m_condition, nil, :m_condition, nil])
         expect(CALLS).to eq([:m_condition, nil, :m_condition])
       end
+    end
+  end
+
+  describe "with multiple methods" do
+    let(:h_class) do
+      Class.new(h_nomemo_class) do
+        memoize :m, :n
+        memoize :x, :y, ttl: 3
+      end
+    end
+
+    let(:h) { h_class.new }
+
+    specify do
+      values = [h.m, h.n, h.m, h.n]
+      expect(values).to eq([:m, :n, :m, :n])
+      expect(CALLS).to eq([:m, :n])
+    end
+
+    specify do
+      values = [h.x, h.y, h.x, h.y]
+      expect(values).to eq([:x, :y, :x, :y])
+      expect(CALLS).to eq([:x, :y])
+
+      allow(Process).to receive(:clock_gettime).with(Process::CLOCK_MONOTONIC)
+        .and_wrap_original { |m, *args| m.call(*args) + 5 }
+
+      later_values = [h.x, h.x, h.y, h.x, h.y, h.y]
+      expect(later_values).to eq([:x, :x, :y, :x, :y, :y])
+      expect(CALLS).to eq([:x, :y, :x, :y])
+    end
+
+
+    specify do
+      expect(h_nomemo_class.memoize(:x, :y, ttl: 3)).to eq([:x, :y])
+    end
+  end
+
+  describe ".memoize return value" do
+    specify do
+      expect(h_nomemo_class.memoize(:x)).to eq(:x)
+      expect(h_nomemo_class.memoize(:m, ttl: 3)).to eq(:m)
+      expect(h_nomemo_class.memoize(:a, condition: -> { 1 == 2 })).to eq(:a)
+    end
+
+    specify do
+      expect(h_nomemo_class.memoize(:x, :y)).to eq([:x, :y])
+      expect(h_nomemo_class.memoize(:m, :n, ttl: 3)).to eq([:m, :n])
+      expect(h_nomemo_class.memoize(:a, :b, condition: -> { 1 == 2 })).to eq([:a, :b])
     end
   end
 
