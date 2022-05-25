@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.name          = "memery"
   spec.version       = Memery::VERSION
   spec.authors       = ["Yuri Smirnov"]
-  spec.email         = ["tycooon@yandex.ru"]
+  spec.email         = ["tycoooon@gmail.com"]
 
   spec.summary       = "A gem for memoization."
   spec.description   = "Memery is a gem for memoization."

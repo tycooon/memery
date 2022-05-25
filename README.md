@@ -1,4 +1,4 @@
-# Memery   [![Gem Version](https://badge.fury.io/rb/memery.svg)](https://badge.fury.io/rb/memery) [![Build Status](https://travis-ci.org/tycooon/memery.svg?branch=master)](https://travis-ci.org/tycooon/memery) [![Coverage Status](https://coveralls.io/repos/github/tycooon/memery/badge.svg?branch=master)](https://coveralls.io/github/tycooon/memery?branch=master)
+# Memery   [![Gem Version](https://badge.fury.io/rb/memery.svg)](https://badge.fury.io/rb/memery) ![Build Status](https://github.com/tycooon/memery/actions/workflows/ci.yml/badge.svg) [![Coverage Status](https://coveralls.io/repos/github/tycooon/memery/badge.svg?branch=master)](https://coveralls.io/github/tycooon/memery?branch=master)
 
 Memery is a Ruby gem for memoization of method return values. The normal memoization in Ruby doesn't require any gems and looks like this:
 
