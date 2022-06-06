@@ -75,7 +75,8 @@ module Memery
         original_arity = klass.instance_method(method_name).arity
 
         define_method(method_name) do |*args, &block|
-          if block || (condition && !instance_exec(&condition))
+          if block || (!condition.nil? &&
+            (condition.is_a?(Proc) ? !instance_exec(&condition) : !condition))
             return super(*args, &block)
           end
 

@@ -42,6 +42,20 @@ class A
 
   memoize :m_condition, condition: -> { environment == "production" }
 
+  def m_condition_bool_true
+    CALLS << __method__
+    __method__
+  end
+
+  memoize :m_condition_bool_true, condition: true
+
+  def m_condition_bool_false
+    CALLS << __method__
+    __method__
+  end
+
+  memoize :m_condition_bool_false, condition: false
+
   def m_ttl(x, y)
     CALLS << [x, y]
     [x, y]
@@ -337,6 +351,26 @@ RSpec.describe Memery do
         values = [ a.m_condition, a.m_nil, a.m_condition, a.m_nil ]
         expect(values).to eq([:m_condition, nil, :m_condition, nil])
         expect(CALLS).to eq([:m_condition, nil, :m_condition])
+      end
+    end
+
+    context "bool is true" do
+      let(:environment) { "development" }
+
+      specify do
+        values = [ a.m_condition_bool_true, a.m_nil, a.m_condition_bool_true, a.m_nil ]
+        expect(values).to eq([:m_condition_bool_true, nil, :m_condition_bool_true, nil])
+        expect(CALLS).to eq([:m_condition_bool_true, nil])
+      end
+    end
+
+    context "bool is false" do
+      let(:environment) { "development" }
+
+      specify do
+        values = [ a.m_condition_bool_false, a.m_nil, a.m_condition_bool_false, a.m_nil ]
+        expect(values).to eq([:m_condition_bool_false, nil, :m_condition_bool_false, nil])
+        expect(CALLS).to eq([:m_condition_bool_false, nil, :m_condition_bool_false])
       end
     end
   end
