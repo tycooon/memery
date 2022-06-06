@@ -42,19 +42,10 @@ class A
 
   memoize :m_condition, condition: -> { environment == "production" }
 
-  def m_condition_bool_true
+  def m_condition_bool
     CALLS << __method__
     __method__
   end
-
-  memoize :m_condition_bool_true, condition: true
-
-  def m_condition_bool_false
-    CALLS << __method__
-    __method__
-  end
-
-  memoize :m_condition_bool_false, condition: false
 
   def m_ttl(x, y)
     CALLS << [x, y]
@@ -330,47 +321,55 @@ RSpec.describe Memery do
   end
 
   describe ":condition option" do
-    before do
-      a.environment = environment
-    end
+    context "with proc" do
+      before do
+        a.environment = environment
+      end
 
-    context "returns true" do
-      let(:environment) { "production" }
+      context "returns true" do
+        let(:environment) { "production" }
 
-      specify do
-        values = [ a.m_condition, a.m_nil, a.m_condition, a.m_nil ]
-        expect(values).to eq([:m_condition, nil, :m_condition, nil])
-        expect(CALLS).to eq([:m_condition, nil])
+        specify do
+          values = [ a.m_condition, a.m_nil, a.m_condition, a.m_nil ]
+          expect(values).to eq([:m_condition, nil, :m_condition, nil])
+          expect(CALLS).to eq([:m_condition, nil])
+        end
+      end
+
+      context "returns false" do
+        let(:environment) { "development" }
+
+        specify do
+          values = [ a.m_condition, a.m_nil, a.m_condition, a.m_nil ]
+          expect(values).to eq([:m_condition, nil, :m_condition, nil])
+          expect(CALLS).to eq([:m_condition, nil, :m_condition])
+        end
       end
     end
 
-    context "returns false" do
-      let(:environment) { "development" }
-
-      specify do
-        values = [ a.m_condition, a.m_nil, a.m_condition, a.m_nil ]
-        expect(values).to eq([:m_condition, nil, :m_condition, nil])
-        expect(CALLS).to eq([:m_condition, nil, :m_condition])
+    context "with bool" do
+      before do
+        A.memoize :m_condition_bool, condition: environment == "production"
       end
-    end
 
-    context "bool is true" do
-      let(:environment) { "development" }
+      context "returns true" do
+        let(:environment) { "production" }
 
-      specify do
-        values = [ a.m_condition_bool_true, a.m_nil, a.m_condition_bool_true, a.m_nil ]
-        expect(values).to eq([:m_condition_bool_true, nil, :m_condition_bool_true, nil])
-        expect(CALLS).to eq([:m_condition_bool_true, nil])
+        specify do
+          values = [ a.m_condition_bool, a.m_nil, a.m_condition_bool, a.m_nil ]
+          expect(values).to eq([:m_condition_bool, nil, :m_condition_bool, nil])
+          expect(CALLS).to eq([:m_condition_bool, nil])
+        end
       end
-    end
 
-    context "bool is false" do
-      let(:environment) { "development" }
+      context "returns false" do
+        let(:environment) { "development" }
 
-      specify do
-        values = [ a.m_condition_bool_false, a.m_nil, a.m_condition_bool_false, a.m_nil ]
-        expect(values).to eq([:m_condition_bool_false, nil, :m_condition_bool_false, nil])
-        expect(CALLS).to eq([:m_condition_bool_false, nil, :m_condition_bool_false])
+        specify do
+          values = [ a.m_condition_bool, a.m_nil, a.m_condition_bool, a.m_nil ]
+          expect(values).to eq([:m_condition_bool, nil, :m_condition_bool, nil])
+          expect(CALLS).to eq([:m_condition_bool, nil, :m_condition_bool])
+        end
       end
     end
   end
