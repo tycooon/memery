@@ -406,13 +406,6 @@ RSpec.describe Memery do
       values = [h.x, h.y, h.x, h.y]
       expect(values).to eq([:x, :y, :x, :y])
       expect(CALLS).to eq([:x, :y])
-
-      allow(Process).to receive(:clock_gettime).with(Process::CLOCK_MONOTONIC)
-        .and_wrap_original { |m, *args| m.call(*args) + 5 }
-
-      later_values = [h.x, h.x, h.y, h.x, h.y, h.y]
-      expect(later_values).to eq([:x, :x, :y, :x, :y, :y])
-      expect(CALLS).to eq([:x, :y, :x, :y])
     end
 
     specify do
