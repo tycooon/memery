@@ -160,8 +160,6 @@ RSpec.describe Memery do
 
       [:a, :b, :m, :n, :x, :y].each do |name|
         define_method(name) do
-          CALLS << name
-          name
         end
       end
     end
