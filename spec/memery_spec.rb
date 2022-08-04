@@ -157,11 +157,7 @@ RSpec.describe Memery do
   let(:unmemoized_class) do
     Class.new do
       include Memery
-
-      [:a, :b, :m, :n, :x, :y].each do |name|
-        define_method(name) do
-        end
-      end
+      attr_reader :a, :b, :m, :n, :x, :y
     end
   end
 
