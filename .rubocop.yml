@@ -3,7 +3,7 @@ inherit_gem:
 
 AllCops:
   DisplayCopNames: true
-  TargetRubyVersion: 2.5
+  TargetRubyVersion: 2.7
 
 Naming/MethodParameterName:
   AllowedNames: ["x", "y", "z"]

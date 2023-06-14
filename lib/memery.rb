@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "ruby2_keywords"
-
 require "memery/version"
 
 module Memery
