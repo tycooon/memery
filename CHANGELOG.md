@@ -1,5 +1,9 @@
 ## [Unreleased]
 
+## [1.5.0] - 2023-06-14
+### Added
+- Allow `memoize` to take multiple method names. ([@nevinera]) [#37]
+
 ## [1.4.0] - 2021-03-15
 ### Fixed
 - Fix compatibility with `ActiveSupport::Concern`. ([@tycooon] and [@AlexWayfer]) [#26]
@@ -48,6 +52,7 @@
 [@tycooon]: https://github.com/tycooon
 [@AlexWayfer]: https://github.com/AlexWayfer
 [@JelF]: https://github.com/JelF
+[@nevinera]: https://github.com/nevinera
 
 [#3]: https://github.com/tycooon/memery/pull/3
 [#7]: https://github.com/tycooon/memery/pull/7
@@ -60,3 +65,4 @@
 [#23]: https://github.com/tycooon/memery/pull/23
 [#25]: https://github.com/tycooon/memery/pull/25
 [#26]: https://github.com/tycooon/memery/pull/26
+[#37]: https://github.com/tycooon/memery/pull/37
