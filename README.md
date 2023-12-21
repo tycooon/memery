@@ -245,6 +245,10 @@ a.users {}
 
 However, this solution is kind of hacky.
 
+## Object Shape Optimization
+
+In Ruby 3.2, a new optimization was introduced that relies on tracking "object shape", and has negative interactions with dynamically added instance variables (introduced after initialization-time). See [here](https://bugs.ruby-lang.org/issues/18776) for details, or [here](https://railsatscale.com/2023-10-24-memoization-pattern-and-object-shapes/) for an explanation of the relevance, but fundamentally Memery has substantial advantages over standard memoization techniques here - it introduces only _one_ new instance variable after initialization (`@_memery_memoized_values`). For particularly performance-critical classes however, you may wish to reduce that to zero; if so, you can call `setup_memery_cache!` in the initializer of your class, and it will set the instance variable before the object shape is determined.
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/tycooon/memery.
