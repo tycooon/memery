@@ -115,6 +115,13 @@ module Memery
   end
 
   module InstanceMethods
+    # This method is not _functionally necessary_, but if called in the
+    # initializer of a class, it allows that class to avoid any issue with the
+    # "object shape optimization" introduced in Ruby 3.2.
+    def setup_memery_cache!
+      @_memery_memoized_values = {}
+    end
+
     def clear_memery_cache!
       @_memery_memoized_values = {}
     end

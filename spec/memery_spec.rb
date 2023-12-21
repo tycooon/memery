@@ -148,6 +148,14 @@ class H
   memoize :x, :y, ttl: 3
 end
 
+class I
+  include Memery
+
+  def initialize
+    setup_memery_cache!
+  end
+end
+
 RSpec.describe Memery do
   subject(:a) { A.new }
 
@@ -473,6 +481,14 @@ RSpec.describe Memery do
       let(:object) { M }
 
       include_examples "works correctly"
+    end
+  end
+
+  describe "#setup_memery_cache!" do
+    let(:i) { I.new }
+
+    specify do
+      expect(i).to be_instance_variable_defined("@_memery_memoized_values")
     end
   end
 end
