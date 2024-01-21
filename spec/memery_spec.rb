@@ -179,6 +179,21 @@ RSpec.describe Memery do
     end
   end
 
+  context "flushing specific cache key" do
+    let(:h) { H.new }
+
+    specify do
+      m_values = [ h.m, h.m ]
+      n_values = [ h.n, h.n ]
+      h.clear_memery_cache(:m)
+      m_values << h.m
+      n_values << h.n
+      expect(m_values).to eq([:m, :m, :m])
+      expect(n_values).to eq([:n, :n, :n])
+      expect(CALLS).to eq([:m, :n, :m])
+    end
+  end
+
   context "method with args" do
     specify do
       values = [ a.m_args(1, 1), a.m_args(1, 1), a.m_args(1, 2) ]
@@ -260,6 +275,17 @@ RSpec.describe Memery do
       expect(values).to eq([100, 100, 100])
       expect(CALLS).to eq([[1, 2]])
       expect(B_CALLS).to eq([[1, 1], [1, 2]])
+    end
+
+    context "clear_memery_cache clears cache for ancestors" do
+      specify do
+        values = [ b.m_args(1, 5), b.m_args(1, 5) ]
+        b.clear_memery_cache(:m_args)
+        values << b.m_args(1, 5)
+        expect(values).to eq([100, 100, 100])
+        expect(CALLS).to eq([[1, 2], [1, 2]])
+        expect(B_CALLS).to eq([[1, 5], [1, 5]])
+      end
     end
   end
 

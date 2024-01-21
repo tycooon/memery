@@ -118,5 +118,20 @@ module Memery
     def clear_memery_cache!
       @_memery_memoized_values = {}
     end
+
+    def clear_memery_cache(method_name)
+      store = @_memery_memoized_values
+      return unless store&.any?
+
+      memoization_klass = Memery::ClassMethods.const_get(:MemoizationModule)
+
+      self.class.ancestors.each do |klass|
+        next unless klass.is_a?(memoization_klass)
+        method_key = "#{method_name}_#{klass.object_id}"
+        store.each_key do |key|
+          store.delete(key) if key == method_key || (key.is_a?(Array) && key.first == method_key)
+        end
+      end
+    end
   end
 end
