@@ -1,6 +1,6 @@
 # Memery   [![Gem Version](https://badge.fury.io/rb/memery.svg)](https://badge.fury.io/rb/memery) ![Build Status](https://github.com/tycooon/memery/actions/workflows/ci.yml/badge.svg) [![Coverage Status](https://coveralls.io/repos/github/tycooon/memery/badge.svg?branch=master)](https://coveralls.io/github/tycooon/memery?branch=master)
 
-Memery is a Ruby gem for memoization of method return values. The normal memoization in Ruby doesn't require any gems and looks like this:
+Memery is a Ruby gem that simplifies memoization of method return values. In Ruby, memoization typically looks like this:
 
 ```ruby
 def user
@@ -8,7 +8,7 @@ def user
 end
 ```
 
-However, this approach doesn't work if calculated result can be `nil` or `false` or in case the method is using arguments. You will also require extra `begin`/`end` lines in case your method requires multiple lines:
+However, this approach fails if the calculated result can be `nil` or `false`, or if the method uses arguments. Additionally, multi-line methods require extra `begin`/`end` blocks:
 
 ```ruby
 def user
@@ -20,7 +20,7 @@ def user
 end
 ```
 
-For all these situations memoization gems (like this one) exist. The last example can be rewritten using memery like this:
+To handle these situations, memoization gems like Memery exist. The example above can be rewritten using Memery as follows:
 
 ```ruby
 memoize def user
@@ -32,7 +32,7 @@ end
 
 ## Installation
 
-Simply add `gem "memery"` to your Gemfile.
+Add `gem "memery"` to your Gemfile.
 
 ## Usage
 
@@ -45,7 +45,7 @@ class A
     42
   end
 
-  # or:
+  # Alternatively:
   # def call
   #   ...
   # end
@@ -56,13 +56,13 @@ a = A.new
 a.call # => 42
 a.call # => 42
 a.call # => 42
-# Text will be printed only once.
+# "calculating" will only be printed once.
 
 a.call { 1 } # => 42
-# Will print because passing a block disables memoization
+# "calculating" will be printed again because passing a block disables memoization.
 ```
 
-Methods with arguments are supported and the memoization will be done based on arguments using an internal hash. So this will work as expected:
+Memoization works with methods that take arguments. The memoization is based on these arguments using an internal hash, so the following will work as expected:
 
 ```ruby
 class A
@@ -78,7 +78,7 @@ a = A.new
 a.call(1, 5) # => 6
 a.call(2, 15) # => 17
 a.call(1, 5) # => 6
-# Text will be printed only twice, once per unique argument list.
+# "calculating" will be printed twice, once for each unique argument list.
 ```
 
 For class methods:
@@ -98,10 +98,10 @@ end
 B.call # => 42
 B.call # => 42
 B.call # => 42
-# Text will be printed only once.
+# "calculating" will only be printed once.
 ```
 
-For conditional memoization:
+### Conditional Memoization
 
 ```ruby
 class A
@@ -136,7 +136,7 @@ a.call # => 42
 # with `true` result of condition block.
 ```
 
-For memoization with time-to-live:
+### Memoization with Time-to-Live (TTL)
 
 ```ruby
 class A
@@ -168,7 +168,7 @@ a.call # => 42
 a.call # => 42
 ```
 
-Check if method is memoized:
+### Checking if a Method is Memoized
 
 ```ruby
 class A
@@ -190,8 +190,9 @@ a.memoized?(:call) # => true
 a.memoized?(:execute) # => false
 ```
 
-## Difference with other gems
-Memery is very similar to [Memoist](https://github.com/matthewrudy/memoist). The difference is that it doesn't override methods, instead it uses Ruby 2 `Module.prepend` feature. This approach is cleaner (for example you are able to inspect the original method body using `method(:x).super_method.source`) and it allows subclasses' methods to work properly: if you redefine a memoized method in a subclass, it's not memoized by default, but you can memoize it normally (without using awkward `identifier: ` argument) and it will just work:
+## Differences from other gems
+
+Memery is similar to [Memoist](https://github.com/matthewrudy/memoist), but it doesn't override methods. Instead, it uses Ruby 2's `Module.prepend` feature. This approach is cleaner, allowing you to inspect the original method body with `method(:x).super_method.source`, and it ensures that subclasses' methods function properly. If you redefine a memoized method in a subclass, it won't be memoized by default. You can memoize it normally without needing an awkward `identifier: ` argument, and it will just work:
 
 ```ruby
 class A
@@ -217,9 +218,9 @@ b.instance_variable_get(:@_memery_memoized_values)
 # => {:x_70318201388120=>{[1]=>2, [2]=>4, [3]=>6}, :x_70318184636620=>{[2]=>2}}
 ```
 
-Note how both method's return values are cached separately and don't interfere with each other.
+Note how both methods' return values are cached separately without interfering with each other.
 
-The other key difference is that it doesn't change method's signature (no extra `reload` param). If you need to get unmemoized result of method, just create an unmemoized version like this:
+Another key difference is that Memery doesn't change the method's signature (no extra `reload` parameter). If you need an unmemoized result, simply create an unmemoized version of the method:
 
 ```ruby
 memoize def users
@@ -231,23 +232,21 @@ def get_users
 end
 ```
 
-Alternatively, you can clear the whole instance's cache:
+Alternatively, you can clear the entire instance's cache:
 
 ```ruby
 a.clear_memery_cache!
 ```
 
-Finally, you can provide a block:
+You can also provide a block, though this approach is somewhat hacky:
 
 ```ruby
 a.users {}
 ```
 
-However, this solution is kind of hacky.
-
 ## Object Shape Optimization
 
-In Ruby 3.2, a new optimization was introduced that relies on tracking "object shape", and has negative interactions with dynamically added instance variables (introduced after initialization-time). See [here](https://bugs.ruby-lang.org/issues/18776) for details, or [here](https://railsatscale.com/2023-10-24-memoization-pattern-and-object-shapes/) for an explanation of the relevance (though both are already somewhat out of date by Ruby 3.3), but fundamentally Memery has substantial advantages over standard memoization techniques here - it introduces only _one_ new instance variable after initialization (`@_memery_memoized_values`), and doesn't expand the object-shape tree substantially. But if you are _desperate_ to confine a particular class to a single object-shape, you can call `clear_memery_cache!` in your initializer to set the instance variable ahead of time.
+In Ruby 3.2, a new optimization called "object shape" was introduced, which can have negative interactions with dynamically added instance variables. Memery minimizes this impact by introducing only one new instance variable after initialization (`@_memery_memoized_values`). If you need to ensure a specific object shape, you can call `clear_memery_cache!` in your initializer to set the instance variable ahead of time.
 
 ## Contributing
 
