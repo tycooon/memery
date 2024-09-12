@@ -11,5 +11,5 @@ task default: %i[lint spec]
 
 desc "run benchmark"
 task :benchmark do
-  require_relative "./benchmark"
+  require_relative "benchmark"
 end

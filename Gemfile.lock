@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    memery (1.5.0)
+    memery (1.6.0)
 
 GEM
   remote: https://rubygems.org/
