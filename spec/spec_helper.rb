@@ -13,7 +13,10 @@ SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
   SimpleCov::Formatter::LcovFormatter,
 ])
 
-SimpleCov.start
+SimpleCov.start do
+  enable_coverage(:branch)
+  minimum_coverage(line: 100, branch: 100)
+end
 
 require "memery"
 require "active_support/concern"
