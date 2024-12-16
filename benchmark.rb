@@ -32,6 +32,10 @@ class Foo
     memoize def find_new(char)
       base_find(char)
     end
+
+    memoize def find_optional(*)
+      base_find("z")
+    end
   end
 end
 
@@ -43,12 +47,24 @@ def test_with_args
   Foo.find_new("d")
 end
 
+def test_empty_args
+  Foo.find_optional
+end
+
 Benchmark.ips do |x|
   x.report("test_no_args") { test_no_args }
 end
 
 Benchmark.memory do |x|
   x.report("test_no_args") { 100.times { test_no_args } }
+end
+
+Benchmark.ips do |x|
+  x.report("test_empty_args") { test_empty_args }
+end
+
+Benchmark.memory do |x|
+  x.report("test_empty_args") { 100.times { test_empty_args } }
 end
 
 Benchmark.ips do |x|
