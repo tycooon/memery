@@ -76,7 +76,6 @@ module Memery
 
       def define_memoized_method!(klass, method_name, condition: nil, ttl: nil)
         original_visibility = method_visibility(klass, method_name)
-        original_arity = klass.instance_method(method_name).arity
         use_hashed_arguments = self.use_hashed_arguments
 
         define_method(method_name) do |*args, &block|
@@ -85,14 +84,8 @@ module Memery
           end
 
           cache_store = (@_memery_memoized_values ||= {})
-          cache_key =
-            if original_arity.zero? || args.empty?
-              method_name
-            elsif use_hashed_arguments
-              [method_name, *args].hash
-            else
-              [method_name, *args]
-            end
+          cache_key = args.empty? ? method_name : [method_name, *args]
+          cache_key = cache_key.hash if use_hashed_arguments && !args.empty?
           cache = cache_store[cache_key]
 
           return cache.result if cache&.fresh?(ttl)
