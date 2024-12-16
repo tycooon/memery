@@ -39,6 +39,22 @@ class Foo
   end
 end
 
+class FooNoHash
+  class << self
+    include Memery
+
+    self.memery_use_hashed_arguments = false
+
+    def base_find(char)
+      ("a".."k").find { |letter| letter == char }
+    end
+
+    memoize def find_new(char)
+      base_find(char)
+    end
+  end
+end
+
 def test_no_args
   Foo.find_z
 end
@@ -49,6 +65,10 @@ end
 
 def test_empty_args
   Foo.find_optional
+end
+
+def test_with_args_no_hash
+  FooNoHash.find_new("d")
 end
 
 Benchmark.ips do |x|
@@ -73,6 +93,14 @@ end
 
 Benchmark.memory do |x|
   x.report("test_with_args") { 100.times { test_with_args } }
+end
+
+Benchmark.ips do |x|
+  x.report("test_with_args_no_hash") { test_with_args_no_hash }
+end
+
+Benchmark.memory do |x|
+  x.report("test_with_args_no_hash") { 100.times { test_with_args_no_hash } }
 end
 
 puts "```"

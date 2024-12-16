@@ -13,6 +13,7 @@ module Memery
     extend(ClassMethods)
     include(InstanceMethods)
     extend ModuleMethods if instance_of?(Module)
+    @memery_use_hashed_arguments = true
   end
 
   private_constant :OUR_BLOCK
@@ -33,6 +34,8 @@ module Memery
   extend ModuleMethods
 
   module ClassMethods
+    attr_accessor :memery_use_hashed_arguments
+
     def memoize(*method_names, condition: nil, ttl: nil)
       prepend_memery_module!
       method_names.each do |method_name|
@@ -53,6 +56,7 @@ module Memery
     def prepend_memery_module!
       return if defined?(@_memery_module)
       @_memery_module = Module.new { extend MemoizationModule }
+      @_memery_module.use_hashed_arguments = memery_use_hashed_arguments
       prepend(@_memery_module)
     end
 
@@ -68,9 +72,12 @@ module Memery
         end
       end
 
+      attr_accessor :use_hashed_arguments
+
       def define_memoized_method!(klass, method_name, condition: nil, ttl: nil)
         original_visibility = method_visibility(klass, method_name)
         original_arity = klass.instance_method(method_name).arity
+        use_hashed_arguments = self.use_hashed_arguments
 
         define_method(method_name) do |*args, &block|
           if block || (condition && !instance_exec(&condition))
@@ -81,8 +88,10 @@ module Memery
           cache_key =
             if original_arity.zero? || args.empty?
               method_name
-            else
+            elsif use_hashed_arguments
               [method_name, *args].hash
+            else
+              [method_name, *args]
             end
           cache = cache_store[cache_key]
 
