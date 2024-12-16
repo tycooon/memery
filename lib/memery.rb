@@ -69,8 +69,6 @@ module Memery
       end
 
       def define_memoized_method!(klass, method_name, condition: nil, ttl: nil)
-        method_key = "#{method_name}_#{object_id}"
-
         original_visibility = method_visibility(klass, method_name)
         original_arity = klass.instance_method(method_name).arity
 
@@ -80,7 +78,7 @@ module Memery
           end
 
           cache_store = (@_memery_memoized_values ||= {})
-          cache_key = original_arity.zero? ? method_key : [method_key, *args].hash
+          cache_key = original_arity.zero? ? method_name : [method_name, *args].hash
           cache = cache_store[cache_key]
 
           return cache.result if cache&.fresh?(ttl)
