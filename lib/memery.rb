@@ -78,7 +78,12 @@ module Memery
           end
 
           cache_store = (@_memery_memoized_values ||= {})
-          cache_key = original_arity.zero? ? method_name : [method_name, *args].hash
+          cache_key =
+            if original_arity.zero? || args.empty?
+              method_name
+            else
+              [method_name, *args].hash
+            end
           cache = cache_store[cache_key]
 
           return cache.result if cache&.fresh?(ttl)
