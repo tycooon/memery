@@ -4,16 +4,19 @@ require "memery/version"
 
 module Memery
   class << self
+    attr_accessor :use_hashed_arguments
+
     def monotonic_clock
       Process.clock_gettime(Process::CLOCK_MONOTONIC)
     end
   end
 
+  @use_hashed_arguments = true
+
   OUR_BLOCK = lambda do
     extend(ClassMethods)
     include(InstanceMethods)
     extend ModuleMethods if instance_of?(Module)
-    @memery_use_hashed_arguments = true
   end
 
   private_constant :OUR_BLOCK
@@ -34,8 +37,6 @@ module Memery
   extend ModuleMethods
 
   module ClassMethods
-    attr_accessor :memery_use_hashed_arguments
-
     def memoize(*method_names, condition: nil, ttl: nil)
       prepend_memery_module!
       method_names.each do |method_name|
@@ -56,7 +57,6 @@ module Memery
     def prepend_memery_module!
       return if defined?(@_memery_module)
       @_memery_module = Module.new { extend MemoizationModule }
-      @_memery_module.use_hashed_arguments = memery_use_hashed_arguments
       prepend(@_memery_module)
     end
 
@@ -72,11 +72,8 @@ module Memery
         end
       end
 
-      attr_accessor :use_hashed_arguments
-
       def define_memoized_method!(klass, method_name, condition: nil, ttl: nil)
         original_visibility = method_visibility(klass, method_name)
-        use_hashed_arguments = self.use_hashed_arguments
 
         define_method(method_name) do |*args, &block|
           if block || (condition && !instance_exec(&condition))
@@ -88,7 +85,7 @@ module Memery
                         method_name
                       else
                         key_parts = [method_name, *args]
-                        use_hashed_arguments ? key_parts.hash : key_parts
+                        Memery.use_hashed_arguments ? key_parts.hash : key_parts
                       end
           cache = cache_store[cache_key]
 
