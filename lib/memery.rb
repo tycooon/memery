@@ -84,8 +84,12 @@ module Memery
           end
 
           cache_store = (@_memery_memoized_values ||= {})
-          cache_key = args.empty? ? method_name : [method_name, *args]
-          cache_key = cache_key.hash if use_hashed_arguments && !args.empty?
+          cache_key = if args.empty?
+                        method_name
+                      else
+                        key_parts = [method_name, *args]
+                        use_hashed_arguments ? key_parts.hash : key_parts
+                      end
           cache = cache_store[cache_key]
 
           return cache.result if cache&.fresh?(ttl)
