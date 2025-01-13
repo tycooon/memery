@@ -74,6 +74,9 @@ module Memery
 
       # rubocop:disable Metrics/MethodLength
       def define_memoized_method!(klass, method_name, condition: nil, ttl: nil)
+        # Include a suffix in the method key to differentiate between methods of the same name
+        # being memoized throughout a class inheritance hierarchy
+        method_key = "#{method_name}_#{klass.name || object_id}"
         original_visibility = method_visibility(klass, method_name)
 
         define_method(method_name) do |*args, &block|
@@ -83,9 +86,9 @@ module Memery
 
           cache_store = (@_memery_memoized_values ||= {})
           cache_key = if args.empty?
-                        method_name
+                        method_key
                       else
-                        key_parts = [method_name, *args]
+                        key_parts = [method_key, *args]
                         Memery.use_hashed_arguments ? key_parts.hash : key_parts
                       end
           cache = cache_store[cache_key]
