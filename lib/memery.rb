@@ -72,6 +72,7 @@ module Memery
         end
       end
 
+      # rubocop:disable Metrics/MethodLength
       def define_memoized_method!(klass, method_name, condition: nil, ttl: nil)
         original_visibility = method_visibility(klass, method_name)
 
@@ -101,6 +102,7 @@ module Memery
         ruby2_keywords(method_name)
         send(original_visibility, method_name)
       end
+      # rubocop:enable Metrics/MethodLength
 
       private
 
