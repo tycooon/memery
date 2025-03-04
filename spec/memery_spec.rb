@@ -153,6 +153,7 @@ RSpec.describe Memery do
 
   before { CALLS.clear }
   before { B_CALLS.clear }
+  before { Memery.use_hashed_arguments = true }
 
   let(:unmemoized_class) do
     Class.new do
@@ -263,6 +264,27 @@ RSpec.describe Memery do
     end
   end
 
+  context "anonymous inherited class" do
+    let(:anonymous_class) do
+      Class.new(A) do
+        memoize def m_args(x, y)
+          B_CALLS << [x, y]
+          super(1, 2)
+          100
+        end
+      end
+    end
+
+    subject(:b) { anonymous_class.new }
+
+    specify do
+      values = [ b.m_args(1, 1), b.m_args(1, 2), b.m_args(1, 1) ]
+      expect(values).to eq([100, 100, 100])
+      expect(CALLS).to eq([[1, 2]])
+      expect(B_CALLS).to eq([[1, 1], [1, 2]])
+    end
+  end
+
   context "module" do
     subject(:c) { C.new }
 
@@ -333,6 +355,26 @@ RSpec.describe Memery do
       values = [e.m, e.m, e.m]
       expect(values).to eq([:m, :m, :m])
       expect(CALLS).to eq([:m])
+    end
+  end
+
+  context "without hashed arguments" do
+    before { Memery.use_hashed_arguments = false }
+
+    context "methods without args" do
+      specify do
+        values = [ a.m, a.m_nil, a.m, a.m_nil ]
+        expect(values).to eq([:m, nil, :m, nil])
+        expect(CALLS).to eq([:m, nil])
+      end
+    end
+
+    context "method with args" do
+      specify do
+        values = [ a.m_args(1, 1), a.m_args(1, 1), a.m_args(1, 2) ]
+        expect(values).to eq([[1, 1], [1, 1], [1, 2]])
+        expect(CALLS).to eq([[1, 1], [1, 2]])
+      end
     end
   end
 

@@ -4,10 +4,14 @@ require "memery/version"
 
 module Memery
   class << self
+    attr_accessor :use_hashed_arguments
+
     def monotonic_clock
       Process.clock_gettime(Process::CLOCK_MONOTONIC)
     end
   end
+
+  @use_hashed_arguments = true
 
   OUR_BLOCK = lambda do
     extend(ClassMethods)
@@ -68,11 +72,12 @@ module Memery
         end
       end
 
+      # rubocop:disable Metrics/MethodLength
       def define_memoized_method!(klass, method_name, condition: nil, ttl: nil)
-        method_key = "#{method_name}_#{object_id}"
-
+        # Include a suffix in the method key to differentiate between methods of the same name
+        # being memoized throughout a class inheritance hierarchy
+        method_key = "#{method_name}_#{klass.name || object_id}"
         original_visibility = method_visibility(klass, method_name)
-        original_arity = klass.instance_method(method_name).arity
 
         define_method(method_name) do |*args, &block|
           if block || (condition && !instance_exec(&condition))
@@ -80,7 +85,12 @@ module Memery
           end
 
           cache_store = (@_memery_memoized_values ||= {})
-          cache_key = original_arity.zero? ? method_key : [method_key, *args].hash
+          cache_key = if args.empty?
+                        method_key
+                      else
+                        key_parts = [method_key, *args]
+                        Memery.use_hashed_arguments ? key_parts.hash : key_parts
+                      end
           cache = cache_store[cache_key]
 
           return cache.result if cache&.fresh?(ttl)
@@ -95,6 +105,7 @@ module Memery
         ruby2_keywords(method_name)
         send(original_visibility, method_name)
       end
+      # rubocop:enable Metrics/MethodLength
 
       private
 

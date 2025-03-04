@@ -190,6 +190,36 @@ a.memoized?(:call) # => true
 a.memoized?(:execute) # => false
 ```
 
+### Marshal-compatible Memoization
+
+In order for objects to be marshaled and loaded in a different Ruby process,
+hashed arguments must be disabled in order for memoized values to be retained.
+Note that this can have a performance impact if the memoized method contains
+arguments.
+
+```ruby
+Memery.use_hashed_arguments = false
+
+class A
+  include Memery
+
+  memoize def call
+    puts "calculating"
+    42
+  end
+end
+
+a = A.new
+a.call
+
+Marshal.dump(a)
+# => "\x04\bo:\x06A\x06:\x1D@_memery_memoized_values{\x06:\tcallS:3Memery::ClassMethods::MemoizationModule::Cache\a:\vresulti/:\ttimef\x14663237.14822323"
+
+# ...in another Ruby process:
+a = Marshal.load("\x04\bo:\x06A\x06:\x1D@_memery_memoized_values{\x06:\tcallS:3Memery::ClassMethods::MemoizationModule::Cache\a:\vresulti/:\ttimef\x14663237.14822323")
+a.call # => 42
+```
+
 ## Differences from Other Gems
 
 Memery is similar to [Memoist](https://github.com/matthewrudy/memoist), but it doesn't override methods. Instead, it uses Ruby 2's `Module.prepend` feature. This approach is cleaner, allowing you to inspect the original method body with `method(:x).super_method.source`, and it ensures that subclasses' methods function properly. If you redefine a memoized method in a subclass, it won't be memoized by default. You can memoize it normally without needing an awkward `identifier: ` argument, and it will just work:

@@ -32,6 +32,10 @@ class Foo
     memoize def find_new(char)
       base_find(char)
     end
+
+    memoize def find_optional(*)
+      base_find("z")
+    end
   end
 end
 
@@ -43,6 +47,10 @@ def test_with_args
   Foo.find_new("d")
 end
 
+def test_empty_args
+  Foo.find_optional
+end
+
 Benchmark.ips do |x|
   x.report("test_no_args") { test_no_args }
 end
@@ -52,11 +60,29 @@ Benchmark.memory do |x|
 end
 
 Benchmark.ips do |x|
+  x.report("test_empty_args") { test_empty_args }
+end
+
+Benchmark.memory do |x|
+  x.report("test_empty_args") { 100.times { test_empty_args } }
+end
+
+Benchmark.ips do |x|
   x.report("test_with_args") { test_with_args }
 end
 
 Benchmark.memory do |x|
   x.report("test_with_args") { 100.times { test_with_args } }
 end
+
+Memery.use_hashed_arguments = false
+Benchmark.ips do |x|
+  x.report("test_with_args_no_hash") { test_with_args }
+end
+
+Benchmark.memory do |x|
+  x.report("test_with_args_no_hash") { 100.times { test_with_args } }
+end
+Memery.use_hashed_arguments = true
 
 puts "```"
