@@ -183,6 +183,14 @@ RSpec.describe Memery do
     end
   end
 
+  context "methods without args memoize on new line" do
+    specify do
+      values = [ a.m_different_line, a.m_nil, a.m_different_line, a.m_nil ]
+      expect(values).to eq([:m_different_line, nil, :m_different_line, nil])
+      expect(CALLS).to eq([:m_different_line, nil])
+    end
+  end
+
   context "flushing cache" do
     specify do
       values = [ a.m, a.m ]
@@ -305,6 +313,12 @@ RSpec.describe Memery do
       values = [c.m, c.m, c.m]
       expect(values).to eq([:m, :m, :m])
       expect(CALLS).to eq([:m])
+    end
+
+    specify do
+      values = [c.m_different_line, c.m_different_line, c.m_different_line]
+      expect(values).to eq([:m_different_line, :m_different_line, :m_different_line])
+      expect(CALLS).to eq([:m_different_line])
     end
 
     context "memoization in class" do
