@@ -535,7 +535,5 @@ RSpec.describe Memery do
 
       include_examples "works correctly"
     end
-
-
   end
 end
