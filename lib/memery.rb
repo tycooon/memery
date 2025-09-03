@@ -38,6 +38,10 @@ module Memery
 
   module ClassMethods
     def memoize(*method_names, condition: nil, ttl: nil)
+      if method_names.empty?
+        @_memery_memoize_next_method = { condition: condition, ttl: ttl }
+        return
+      end
       prepend_memery_module!
       method_names.each do |method_name|
         define_memoized_method!(method_name, condition: condition, ttl: ttl)
@@ -50,6 +54,15 @@ module Memery
 
       @_memery_module.method_defined?(method_name) ||
       @_memery_module.private_method_defined?(method_name)
+    end
+
+    def method_added(name)
+      super
+
+      return unless @_memery_memoize_next_method
+
+      memoize(name, **@_memery_memoize_next_method)
+      @_memery_memoize_next_method = nil
     end
 
     private
