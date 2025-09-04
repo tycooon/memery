@@ -14,6 +14,12 @@ class A
     m_private
   end
 
+  memoize
+  def m_different_line
+    CALLS << :m_different_line
+    :m_different_line
+  end
+
   def not_memoized; end
 
   memoize def m_nil
@@ -78,6 +84,13 @@ module M
   memoize def m
     CALLS << :m
     :m
+  end
+
+  memoize
+
+  def m_different_line
+    CALLS << :m_different_line
+    :m_different_line
   end
 
   def not_memoized; end
@@ -167,6 +180,14 @@ RSpec.describe Memery do
       values = [ a.m, a.m_nil, a.m, a.m_nil ]
       expect(values).to eq([:m, nil, :m, nil])
       expect(CALLS).to eq([:m, nil])
+    end
+  end
+
+  context "methods without args memoize on new line" do
+    specify do
+      values = [ a.m_different_line, a.m_nil, a.m_different_line, a.m_nil ]
+      expect(values).to eq([:m_different_line, nil, :m_different_line, nil])
+      expect(CALLS).to eq([:m_different_line, nil])
     end
   end
 
@@ -292,6 +313,12 @@ RSpec.describe Memery do
       values = [c.m, c.m, c.m]
       expect(values).to eq([:m, :m, :m])
       expect(CALLS).to eq([:m])
+    end
+
+    specify do
+      values = [c.m_different_line, c.m_different_line, c.m_different_line]
+      expect(values).to eq([:m_different_line, :m_different_line, :m_different_line])
+      expect(CALLS).to eq([:m_different_line])
     end
 
     context "memoization in class" do
@@ -476,6 +503,12 @@ RSpec.describe Memery do
     shared_examples "works correctly" do
       context "public memoized method" do
         let(:method_name) { :m }
+
+        it { is_expected.to be true }
+      end
+
+      context "memoize is on a different line" do
+        let(:method_name) { :m_different_line }
 
         it { is_expected.to be true }
       end
