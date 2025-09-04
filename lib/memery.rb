@@ -73,8 +73,8 @@ module Memery
       prepend(@_memery_module)
     end
 
-    def define_memoized_method!(method_name, **options)
-      @_memery_module.define_memoized_method!(self, method_name, **options)
+    def define_memoized_method!(method_name, **)
+      @_memery_module.define_memoized_method!(self, method_name, **)
     end
 
     module MemoizationModule
