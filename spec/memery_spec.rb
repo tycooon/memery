@@ -541,13 +541,13 @@ RSpec.describe Memery do
     context "class" do
       let(:object) { A }
 
-      include_examples "works correctly"
+      it_behaves_like "works correctly"
     end
 
     context "module" do
       let(:object) { M }
 
-      include_examples "works correctly"
+      it_behaves_like "works correctly"
     end
   end
 end
